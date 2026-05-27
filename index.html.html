@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Catálogo dinámico – Envases Devoto</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f1e8;--paper:#fffaf0;--ink:#1d1a16;--muted:#746b5f;--line:#ded3c0;--accent:#d9902f;--blue:#1f4f7a;--green:#16803f;--red:#b91c1c;--shadow:0 10px 28px rgba(29,26,22,.1)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}header{background:linear-gradient(135deg,#1d1a16,#32291c);color:#fff;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:14px}.logo{background:var(--accent);color:var(--ink);font-family:'Bebas Neue';font-size:42px;line-height:1;padding:5px 10px;border-radius:7px}.brand h1{font-family:'Bebas Neue';letter-spacing:.08em;margin:0;font-size:30px}.brand p{margin:3px 0 0;color:#d7cabb;font-size:12px;text-transform:uppercase;letter-spacing:.22em}.top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.pill{border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;border-radius:12px;padding:10px 13px;cursor:pointer}.cart-pill{min-width:160px;text-align:right}.cart-pill small{display:block;color:#d7cabb;text-transform:uppercase;letter-spacing:.12em}.cart-pill strong{font-family:'Bebas Neue';font-size:27px;color:var(--accent);letter-spacing:.04em}nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);display:flex;overflow:auto;box-shadow:0 3px 15px rgba(0,0,0,.06)}nav button{border:0;background:transparent;padding:15px 20px;font-weight:700;color:var(--muted);white-space:nowrap;cursor:pointer;border-bottom:3px solid transparent}nav button.active{color:var(--blue);border-bottom-color:var(--blue)}.toolbar{background:#fff;padding:14px 18px;border-bottom:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap}.toolbar input{flex:1;min-width:220px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px}.container{padding:20px;max-width:1400px;margin:0 auto}.notice{background:#fff7e6;border:1px solid #f1c77f;border-radius:12px;padding:16px;margin:16px 20px;color:#4b3410}.section{margin:0 0 28px}.section-title{font-family:'Bebas Neue';font-size:32px;letter-spacing:.05em;margin:0 0 14px;display:flex;align-items:center;gap:10px}.section-title:before{content:"";display:inline-block;width:8px;height:30px;background:var(--accent);border-radius:9px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:.18s transform,.18s box-shadow}.card:hover{transform:translateY(-2px);box-shadow:0 14px 35px rgba(29,26,22,.14)}.photo{aspect-ratio:1/1;height:auto;background:#eadfcf;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer}.photo img{width:100%;height:100%;object-fit:cover}.photo .placeholder{font-family:'Bebas Neue';font-size:50px;color:#b79d76;letter-spacing:.08em}.badge{position:absolute;top:10px;left:10px;background:var(--ink);color:#fff;font-weight:800;border-radius:999px;padding:5px 10px;font-size:12px}.barcode{position:absolute;right:10px;bottom:10px;background:#fff;border:1px solid var(--line);border-radius:9px;width:96px;height:36px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);overflow:hidden}.barcode img{max-width:100%;max-height:100%;object-fit:contain}.content{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}.sku{font-size:12px;color:#fff;background:var(--blue);display:inline-block;width:max-content;border-radius:6px;padding:3px 7px;font-weight:800}.name{font-weight:800;font-size:16px;line-height:1.2}.model{color:var(--muted);font-size:13px}.desc{font-size:12px;color:#5b5249;line-height:1.35;min-height:34px}.meta{font-size:12px;color:var(--muted)}.tag{font-size:11px;color:var(--green);font-weight:800}.price{font-family:'Bebas Neue';font-size:31px;color:var(--ink);letter-spacing:.03em;margin-top:auto}.controls{display:flex;gap:8px;align-items:center}.controls button{width:36px;height:36px;border:0;border-radius:10px;background:var(--ink);color:#fff;font-size:20px;cursor:pointer}.controls input{width:64px;text-align:center;border:1px solid var(--line);border-radius:10px;padding:9px;font-weight:800}.subtotal{font-size:12px;color:var(--blue);font-weight:800;margin-left:auto}.summary{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);position:fixed;right:18px;bottom:18px;width:min(420px,calc(100vw - 36px));max-height:75vh;overflow:auto;display:none;z-index:50}.summary.show{display:block}.summary h2{font-family:'Bebas Neue';font-size:30px;margin:0 0 10px}.summary-row{display:grid;grid-template-columns:1fr 45px 90px;gap:8px;border-bottom:1px solid var(--line);padding:8px 0;font-size:13px}.summary-total{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-weight:900}.summary-total strong{font-family:'Bebas Neue';font-size:32px;color:var(--green)}.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer}.btn-green{background:var(--green);color:#fff;width:100%;margin-top:10px}.btn-light{background:#f5f1e8;color:var(--ink);width:100%;margin-top:8px}.btn-blue{background:var(--blue);color:#fff;width:100%;margin-top:8px}.order-fields{display:grid;gap:8px;margin:12px 0}.order-fields label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.order-fields input,.order-fields select,.order-fields textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-family:Inter,system-ui,sans-serif;font-size:14px}.order-fields textarea{min-height:64px;resize:vertical}.summary-actions{display:grid;gap:8px;margin-top:10px}.summary-actions .btn{margin-top:0}.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:99;padding:20px}.modal.show{display:flex}.modal-card{background:#fff;border-radius:18px;max-width:720px;width:100%;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.25)}.modal-card h2{font-family:'Bebas Neue';font-size:32px;margin:0 0 8px}.modal-card input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}.help{font-size:13px;color:var(--muted);line-height:1.5}.close{float:right;background:none;border:0;font-size:24px;cursor:pointer}.empty{padding:40px;text-align:center;color:var(--muted)}@media(max-width:720px){header{padding:18px}.brand h1{font-size:24px}.grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}.photo{aspect-ratio:1/1;height:auto}.container{padding:14px}.section-title{font-size:26px}.content{padding:11px}.price{font-size:26px}.desc{display:none}.summary{right:10px;bottom:10px;width:calc(100vw - 20px)}}@media print{header,nav,.toolbar,.controls,.top-actions,.summary .btn,.pill{display:none}.card{break-inside:avoid;box-shadow:none}.container{padding:0}.photo{aspect-ratio:1/1;height:auto}}
+
+.barcode-text-wrap{
+  margin-top:4px;
+  margin-bottom:4px;
+}
+.barcode-label{
+  font-size:10px;
+  text-transform:uppercase;
+  color:#777;
+  letter-spacing:.08em;
+  font-weight:700;
+}
+.barcode-number{
+  font-size:13px;
+  color:#555;
+  font-weight:600;
+}
+
+
+.material-notice{
+  margin:18px auto 0;
+  max-width:1400px;
+  background:#fffaf0;
+  border:1px solid var(--line);
+  border-left:8px solid var(--accent);
+  border-radius:16px;
+  padding:16px 20px;
+  color:var(--ink);
+  box-shadow:var(--shadow);
+  font-size:14px;
+  line-height:1.45;
+}
+.material-notice strong{
+  display:block;
+  font-size:16px;
+  font-weight:900;
+  margin-bottom:4px;
+}
+.material-notice span{
+  color:var(--muted);
+  font-weight:600;
+}
+@media(max-width:720px){
+  .material-notice{margin:14px 14px 0;font-size:12px;padding:14px}
+  .material-notice strong{font-size:14px}
+}
+
+
+/* Modo PDF / impresión del catálogo completo */
+.pdf-hint{font-size:12px;color:#d7cabb;margin-top:4px}
+body.pdf-mode .controls, body.pdf-mode .summary, body.pdf-mode .modal{display:none!important}
+@media print{
+  @page{size:A4;margin:10mm}
+  body{background:#fff!important}
+  header{display:flex!important;background:#fff!important;color:#1d1a16!important;border-bottom:2px solid #ded3c0;padding:0 0 10px 0;margin-bottom:10px}
+  header .top-actions, nav, .toolbar, .controls, .summary, .modal, #setupNotice{display:none!important}
+  .logo{background:#d9902f!important;color:#1d1a16!important}
+  .brand p{color:#746b5f!important}
+  .material-notice{box-shadow:none!important;margin:0 0 12px!important;border-radius:10px!important}
+  .container{max-width:none!important;padding:0!important}
+  .section{page-break-inside:avoid;margin-bottom:14px!important}
+  .section-title{font-size:24px!important;margin-bottom:8px!important}
+  .grid{grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
+  .card{box-shadow:none!important;border-radius:10px!important;border:1px solid #ded3c0!important;break-inside:avoid!important;page-break-inside:avoid!important}
+  .photo{aspect-ratio:1/1!important}
+  .content{padding:8px!important;gap:4px!important}
+  .sku{font-size:9px!important;padding:2px 5px!important}
+  .barcode-text-wrap{display:none!important}
+  .name{font-size:11px!important;line-height:1.15!important}
+  .desc{display:none!important}
+  .meta{font-size:9px!important}
+  .tag{font-size:8px!important}
+  .price{font-size:20px!important}
+}
+
+/* Carrusel de imágenes por producto */
+.photo-slider{width:100%;height:100%;position:relative;overflow:hidden}
+.photo-slider img{width:100%;height:100%;object-fit:cover;display:block}
+.img-nav{position:absolute;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;border-radius:999px;background:rgba(29,26,22,.72);color:#fff;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;line-height:1}
+.img-nav.prev{left:8px}.img-nav.next{right:8px}
+.img-count{position:absolute;right:8px;bottom:8px;background:rgba(29,26,22,.72);color:#fff;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:800;z-index:3}
+@media print{.img-nav,.img-count{display:none!important}}
+
+
+.features-bar{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:14px;
+max-width:1400px;
+margin:18px auto 0;
+padding:0 20px;
+}
+.feature-item{
+background:#fff;
+border:1px solid #ded3c0;
+border-radius:18px;
+padding:16px;
+display:flex;
+align-items:center;
+gap:14px;
+box-shadow:0 8px 20px rgba(0,0,0,.05);
+font-size:30px;
+}
+.feature-item strong{
+display:block;
+font-size:16px;
+}
+.feature-item span{
+font-size:13px;
+color:#746b5f;
+}
+.howto-box{
+max-width:1400px;
+margin:16px auto;
+background:#fffaf0;
+border:1px solid #ded3c0;
+border-left:8px solid #d9902f;
+border-radius:16px;
+padding:16px 22px;
+font-size:14px;
+line-height:1.5;
+box-shadow:0 8px 20px rgba(0,0,0,.04);
+}
+.howto-box strong{
+font-size:16px;
+display:block;
+margin-bottom:8px;
+}
+.howto-box ol{
+margin:0;
+padding-left:18px;
+}
+nav button:last-child{
+background:#fff5f5;
+color:#b91c1c;
+font-weight:900;
+border-left:1px solid #f1d4d4;
+}
+nav button:last-child:hover{
+background:#ffeaea;
+}
+@media(max-width:720px){
+.features-bar{
+grid-template-columns:1fr;
+padding:0 14px;
+}
+.feature-item{
+font-size:24px;
+padding:14px;
+}
+.howto-box{
+margin:14px;
+font-size:13px;
+}
+}
+
+
+.best-sellers-box{
+max-width:1400px;
+margin:16px auto 0;
+padding:0 20px;
+}
+.best-sellers-card{
+background:#fff;
+border:1px solid #ded3c0;
+border-radius:18px;
+padding:18px;
+box-shadow:0 8px 22px rgba(0,0,0,.05);
+}
+.best-sellers-title{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+margin-bottom:12px;
+}
+.best-sellers-title strong{
+font-family:'Bebas Neue';
+font-size:28px;
+letter-spacing:.04em;
+}
+.best-sellers-title span{
+font-size:13px;
+color:#746b5f;
+font-weight:700;
+}
+.best-sellers-list{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+gap:10px;
+}
+.best-seller-item{
+background:#fffaf0;
+border:1px solid #eadfcf;
+border-radius:14px;
+padding:12px;
+display:flex;
+align-items:center;
+gap:10px;
+}
+.best-seller-rank{
+background:#d9902f;
+color:#1d1a16;
+font-weight:900;
+border-radius:999px;
+width:32px;
+height:32px;
+display:flex;
+align-items:center;
+justify-content:center;
+flex:0 0 auto;
+}
+.best-seller-name{
+font-size:13px;
+font-weight:900;
+line-height:1.25;
+}
+.best-seller-units{
+font-size:12px;
+color:#746b5f;
+margin-top:2px;
+}
+@media(max-width:720px){
+.best-sellers-box{padding:0 14px}
+.best-sellers-title{align-items:flex-start;flex-direction:column}
+.best-sellers-title strong{font-size:24px}
+}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">ED</div><div><h1>Catálogo Mayorista</h1><p>Envases Devoto · Artemporáneo</p></div></div>
+  <div class="top-actions"><button class="pill" onclick="openConfig()">⚙️ Configurar Google Sheets</button><button class="pill" onclick="downloadCatalogPDF()">📄 Descargar Catálogo PDF</button><div class="pill cart-pill" onclick="toggleSummary()"><small>Pedido actual</small><strong id="topTotal">$ 0</strong></div></div>
+</header>
+<nav id="tabs"></nav>
+<div class="toolbar"><input id="search" placeholder="Buscar por nombre, SKU o sección…" oninput="render()"><button class="btn" onclick="clearCart()">Vaciar pedido</button></div>
+<div class="features-bar">
+  <div class="feature-item">🇦🇷 <div><strong>Industria Argentina</strong><span>Productos diseñados y fabricados por nosotros</span></div></div>
+  <div class="feature-item">🏭 <div><strong>Fabricantes directos</strong><span>Sin intermediarios, mejores precios</span></div></div>
+  <div class="feature-item">✨ <div><strong>Corte Láser</strong><span>Terminaciones precisas y profesionales</span></div></div>
+</div>
+
+<div class="howto-box">
+  <strong>¿Cómo realizar un pedido?</strong>
+  <ol>
+    <li>Agregá los productos al carrito.</li>
+    <li>Seleccioná tu vendedor correspondiente.</li>
+    <li>Completá los datos del local o negocio.</li>
+    <li>Enviá el pedido por WhatsApp.</li>
+  </ol>
+</div>
+
+
+<div class="best-sellers-box" id="bestSellersBox" style="display:none">
+  <div class="best-sellers-card">
+    <div class="best-sellers-title">
+      <strong>🔥 Productos más elegidos</strong>
+      <span>Una guía rápida para armar tu pedido</span>
+    </div>
+    <div id="bestSellersList" class="best-sellers-list"></div>
+  </div>
+</div>
+
+<div class="material-notice">
+  <strong>Fabricados en fibroplus de 3mm y 5mm con terminación láser.</strong>
+  <span>Los productos se envían en colores surtidos según stock.</span>
+</div>
+<div id="setupNotice" class="notice" style="display:none"><b>Google Sheets conectado.</b> Tocá “Configurar Google Sheets” y pegá la URL de OpenSheet. Ejemplo: https://docs.google.com/spreadsheets/d/e/.../pub?output=csv</div>
+<main class="container" id="catalog"></main>
+<aside class="summary" id="summary"><button class="close" onclick="toggleSummary()">×</button><h2>Mi Pedido</h2><div class="order-fields">
+  <label for="sellerSelect">Vendedor</label>
+  <select id="sellerSelect">
+    <option value="5491158845921">Pablo Contreras</option>
+    <option value="5491165109886">Sofia Albanese</option>
+    <option value="5491140454208">Alejandro K.</option>
+    <option value="5491154909222">Marcelo K.</option>
+    <option value="5491139226952">Ariel Acevedo</option>
+    <option value="5491158130408">Gustavo De Nicola</option>
+  </select>
+  <label for="clientName">Cliente / Local</label>
+  <input id="clientName" placeholder="Nombre del cliente o negocio">
+  <label for="clientNote">Observaciones</label>
+  <textarea id="clientNote" placeholder="Dirección, forma de pago, datos de entrega, etc."></textarea>
+</div><div id="summaryItems"></div><div class="summary-total"><span>Total</span><strong id="summaryTotal">$ 0</strong></div><div class="summary-actions"><button class="btn btn-green" onclick="sendWhatsApp()">Enviar pedido por WhatsApp</button>
+<button class="btn btn-blue" onclick="downloadOrderExcel()">Descargar pedido en Excel</button>
+<button class="btn btn-light" onclick="saveOrder()">Guardar pedido</button>
+<button class="btn btn-light" onclick="showStats()">Ver estadísticas</button>
+<button class="btn btn-light" onclick="copyOrder()">Copiar pedido</button></div></aside>
+<div class="modal" id="configModal"><div class="modal-card"><button class="close" onclick="closeConfig()">×</button><h2>Conectar Google Sheets</h2><p class="help">Pegá el link CSV publicado de Google Sheets. La página la guarda en este navegador. Después solo editás la planilla y el catálogo se actualiza al recargar.</p><input id="sheetUrl" placeholder="https://opensheet.elk.sh/ID_DEL_SHEET/Productos"><button class="btn btn-green" onclick="saveConfig()">Guardar y cargar catálogo</button><button class="btn btn-light" onclick="loadDemo()">Usar demo local</button><p class="help"><b>Columnas esperadas:</b> Activo, Categoria, Seccion, SKU, Producto, Descripcion, Medida, Precio, ImagenURL, ImagenURL2, CodigoBarra, EtiquetasIncluidas, Orden.</p></div></div>
+<script>
+let SHEET_URL = localStorage.getItem('catalogSheetUrl') || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS-1cWV4vv5RHwzD2FaPTZCKVS8KdJw4csZaYsqNt0OQtYb9Ef7qqwgCjvyG6WxGWz6RVzXPAP-ZwOK/pub?gid=805595643&single=true&output=csv';
+let products = [];
+let cart = JSON.parse(localStorage.getItem('catalogCart') || '{}');
+let activeCat = localStorage.getItem('activeCat') || '';
+let pdfMode = false;
+const demo = [
+ {Activo:'SI',Categoria:'Cocina & Deco',Seccion:'Especieros · Línea Tubos 44cc',SKU:'ESP.01',Producto:'Especiero Calado x8',Descripcion:'Incluye etiquetas con nombres de especias.',Medida:'16×18×9,5cm',Precio:'6855',ImagenURL:'',CodigoBarra:'',EtiquetasIncluidas:'SI',Orden:'1'},
+ {Activo:'SI',Categoria:'Cocina & Deco',Seccion:'Posa Vasos y Fuentes',SKU:'PFV.01',Producto:'Pack de 6 posa vasos y fuente',Descripcion:'Pack de 6 posa vasos + 1 fuente.',Medida:'',Precio:'7781',ImagenURL:'',CodigoBarra:'',EtiquetasIncluidas:'',Orden:'2'},
+ {Activo:'SI',Categoria:'Cocina & Deco',Seccion:'Posa Vasos Grabados',SKU:'PVG.001',Producto:'Posa vaso grabado',Descripcion:'Modelo Musical.',Medida:'',Precio:'1879',ImagenURL:'',CodigoBarra:'',EtiquetasIncluidas:'',Orden:'3'},
+ {Activo:'SI',Categoria:'Aroma & Bienestar',Seccion:'Fanales',SKU:'FNC.01',Producto:'Fanal Cubo Luna',Descripcion:'Con bocha de vidrio + vela.',Medida:'10×10cm',Precio:'4012',ImagenURL:'',CodigoBarra:'',EtiquetasIncluidas:'',Orden:'4'}
+];
+function money(n){return '$ '+Number(n||0).toLocaleString('es-AR')}
+function cleanPrice(v){
+  let s = String(v ?? '').trim();
+  if(!s) return 0;
+  s = s.replace(/\s/g,'').replace(/[^0-9,.-]/g,'');
+  if(!s) return 0;
+  const hasComma = s.includes(',');
+  const hasDot = s.includes('.');
+  // Formato argentino: 1.234,56 o 1.234
+  if(hasComma){
+    s = s.replace(/\./g,'').replace(',', '.');
+  }else if(hasDot){
+    const parts = s.split('.');
+    // Si hay varios puntos o el último grupo tiene 3 dígitos, los puntos son separadores de miles
+    if(parts.length > 2 || (parts.at(-1) || '').length === 3){
+      s = s.replace(/\./g,'');
+    }
+  }
+  return Number(s) || 0;
+}
+function qty(sku){return Number(cart[sku]||0)}
+function setQty(sku, value){value=Math.max(0,Number(value)||0); if(value){cart[sku]=value}else{delete cart[sku]} localStorage.setItem('catalogCart',JSON.stringify(cart)); renderTotals(); render();}
+function inc(sku, delta=1){setQty(sku, qty(sku)+delta)}
+function clearCart(){if(confirm('Vaciar todo el pedido?')){cart={};localStorage.setItem('catalogCart','{}');renderTotals();render();}}
+function parseCSV(text){
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(c === '"' && q && n === '"'){ cell += '"'; i++; continue; }
+    if(c === '"'){ q = !q; continue; }
+    if(c === ',' && !q){ row.push(cell); cell=''; continue; }
+    if((c === '\n' || c === '\r') && !q){
+      if(c === '\r' && n === '\n') i++;
+      row.push(cell); cell='';
+      if(row.some(v => String(v).trim() !== '')) rows.push(row);
+      row=[];
+      continue;
+    }
+    cell += c;
+  }
+  row.push(cell);
+  if(row.some(v => String(v).trim() !== '')) rows.push(row);
+  if(!rows.length) return [];
+  const headers = rows.shift().map(h => String(h).trim());
+  return rows.map(r => {
+    const obj={};
+    headers.forEach((h,i)=> obj[h] = (r[i] ?? '').trim());
+    return obj;
+  });
+}
+async function load(){
+  document.getElementById('setupNotice').style.display = SHEET_URL ? 'none':'block';
+  if(!SHEET_URL){products=demo; render(); return}
+  try{
+    const res=await fetch(SHEET_URL);
+    if(!res.ok) throw new Error('No se pudo leer Google Sheets');
+    const text=await res.text();
+    const trimmed=text.trim();
+    products = trimmed.startsWith('[') ? JSON.parse(trimmed) : parseCSV(text);
+    if(!products.length) throw new Error('La hoja está vacía o no se pudo leer');
+    render();
+  }catch(e){
+    document.getElementById('setupNotice').style.display='block';
+    document.getElementById('setupNotice').innerHTML='<b>Error al cargar Google Sheets.</b> Revisá que el link publicado sea público y esté en formato CSV. Mientras tanto se muestra la demo.';
+    products=demo; render();
+  }
+}
+function renderTabs(cats){const tabs=document.getElementById('tabs'); if(!activeCat || !cats.includes(activeCat)) activeCat=cats[0]||''; tabs.innerHTML=cats.map(c=>`<button class="${c===activeCat?'active':''}" onclick="activeCat='${c.replace(/'/g,"\\'")}';localStorage.setItem('activeCat',activeCat);render()">${c}</button>`).join('') + `<button onclick="toggleSummary()">📋 Mi Pedido</button>`}
+function render(){let list=products.filter(p=>(p.Activo||'SI').toUpperCase()!=='NO').sort((a,b)=>(Number(a.Orden)||9999)-(Number(b.Orden)||9999)); const q=document.getElementById('search').value.toLowerCase().trim(); const cats=[...new Set(list.map(p=>p.Categoria||'Sin categoría'))]; renderTabs(cats); if(!pdfMode){list=list.filter(p=>(p.Categoria||'Sin categoría')===activeCat)}; if(q && !pdfMode){list=list.filter(p=>Object.values(p).join(' ').toLowerCase().includes(q))} const bySec={}; list.forEach(p=>{const s=p.Seccion||'General'; (bySec[s] ||= []).push(p)}); const catalog=document.getElementById('catalog'); if(!list.length){catalog.innerHTML='<div class="empty">No hay productos para mostrar.</div>';return} catalog.innerHTML=Object.entries(bySec).map(([sec,items])=>`<section class="section"><h2 class="section-title">${sec}</h2><div class="grid">${items.map(card).join('')}</div></section>`).join(''); renderTotals(false)}
+
+function firstValue(p, names){
+  for(const name of names){
+    if(p[name] && String(p[name]).trim()) return String(p[name]).trim();
+  }
+  // fallback: busca columnas con mismo nombre ignorando espacios, guiones y mayúsculas
+  const normalized = {};
+  Object.keys(p).forEach(k => normalized[String(k).toLowerCase().replace(/[^a-z0-9]/g,'')] = k);
+  for(const name of names){
+    const key = normalized[String(name).toLowerCase().replace(/[^a-z0-9]/g,'')];
+    if(key && p[key] && String(p[key]).trim()) return String(p[key]).trim();
+  }
+  return '';
+}
+
+function getPrice(p){
+  return cleanPrice(firstValue(p,[
+    'Precio','PRECIO','precio',
+    'Precio Mayorista','PRECIO MAYORISTA','precio mayorista',
+    'Mayorista','MAYORISTA',
+    'Precio Lista','PRECIO LISTA','Lista','LISTA',
+    'Precio Venta','PRECIO VENTA','Venta','VENTA',
+    'Precio Unitario','PRECIO UNITARIO',
+    'Importe','IMPORTE','Valor','VALOR'
+  ]));
+}
+
+function productImages(p){
+  const raw = [
+    firstValue(p,['ImagenURL','Imagen URL','Url','URL','url','Imagen','Foto','FotoURL']),
+    firstValue(p,['ImagenURL2','Imagen URL 2','URL2','Url2','url2','Url 2','URL 2','url 2','Imagen2','Imagen 2','Foto2','Foto 2','FotoURL2'])
+  ].filter(Boolean).join(',');
+  return raw.split(/[,;|]/).map(x=>x.trim()).filter(Boolean);
+}
+function changeProductImage(btn, delta){
+  event.stopPropagation();
+  const slider = btn.closest('.photo-slider');
+  const imgs = JSON.parse(slider.dataset.images || '[]');
+  if(!imgs.length) return;
+  let index = Number(slider.dataset.index || 0);
+  index = (index + delta + imgs.length) % imgs.length;
+  slider.dataset.index = index;
+  const img = slider.querySelector('img');
+  const count = slider.querySelector('.img-count');
+  img.src = imgs[index];
+  if(count) count.textContent = `${index+1}/${imgs.length}`;
+}
+
+function card(p){const price=getPrice(p); const q=qty(p.SKU); const initials=(p.Producto||p.SKU||'ED').split(' ').map(x=>x[0]).join('').slice(0,3); const barcode=(p.CodigoBarra||'ESPACIO CÓDIGO DE BARRAS');
+const cleanDesc=String(p.Descripcion||'')
+  .split(/\n|\r|;/)
+  .map(x=>x.trim())
+  .filter(x=>x && !/^(base\s*:|fibroplus|fibrof[aá]cil|colores?\s+surtidos)/i.test(x))
+  .join('<br>');
+const images = productImages(p);
+const imageHtml = images.length
+  ? `<div class="photo-slider" data-index="0" data-images='${JSON.stringify(images).replace(/'/g,"&#39;")}'><img src="${images[0]}" alt="${p.Producto||''}">${images.length>1?`<button class="img-nav prev" onclick="changeProductImage(this,-1)">‹</button><button class="img-nav next" onclick="changeProductImage(this,1)">›</button><span class="img-count">1/${images.length}</span>`:''}</div>`
+  : `<div class="placeholder">${initials}</div>`;
+return `<article class="card"><div class="photo" onclick="inc('${p.SKU}')">${imageHtml}</div><div class="content"><span class="sku">${p.SKU}</span>
+<div class="barcode-text-wrap">
+  <div class="barcode-label">Código de barras</div>
+  <div class="barcode-number">${barcode}</div>
+</div>
+<div class="name">${p.Producto||''}</div>${cleanDesc?`<div class="desc">${cleanDesc}</div>`:''}${p.Medida?`<div class="meta">Medida: ${p.Medida}</div>`:''}${(p.EtiquetasIncluidas||'').toUpperCase()==='SI'?`<div class="tag">Incluye etiquetas con nombres de especias</div>`:''}<div class="price">${money(price)}</div><div class="controls"><button onclick="inc('${p.SKU}',-1)">−</button><input type="number" min="0" value="${q}" onchange="setQty('${p.SKU}',this.value)"><button onclick="inc('${p.SKU}',1)">+</button><span class="subtotal">${q?money(q*price):''}</span></div></div></article>`}
+function renderTotals(rebuildSummary=true){let total=0,count=0; products.forEach(p=>{const q=qty(p.SKU); if(q){total+=q*getPrice(p); count+=q}}); document.getElementById('topTotal').textContent=money(total); document.getElementById('summaryTotal').textContent=money(total); if(rebuildSummary) renderSummary()}
+function renderSummary(){const wrap=document.getElementById('summaryItems'); const items=products.filter(p=>qty(p.SKU)); if(!items.length){wrap.innerHTML='<div class="empty">Todavía no agregaste productos.</div>';return} wrap.innerHTML=items.map(p=>`<div class="summary-row"><div><b>${p.SKU}</b> · ${p.Producto}</div><div>x${qty(p.SKU)}</div><div>${money(qty(p.SKU)*getPrice(p))}</div></div>`).join('')}
+function toggleSummary(){document.getElementById('summary').classList.toggle('show'); renderSummary()}
+function cartItems(){return products.filter(p=>qty(p.SKU))}
+function selectedSellerPhone(){return document.getElementById('sellerSelect')?.value || ''}
+function selectedSellerName(){const s=document.getElementById('sellerSelect'); return s ? s.options[s.selectedIndex].text : ''}
+function clientInfoText(){
+  const name=(document.getElementById('clientName')?.value || '').trim();
+  const note=(document.getElementById('clientNote')?.value || '').trim();
+  let txt='';
+  if(name) txt += `Cliente / local: ${name}\n`;
+  if(note) txt += `Observaciones: ${note}\n`;
+  return txt;
+}
+function orderPlainText(){
+  const items=cartItems();
+  let txt='Hola! Te paso mi pedido:\n\n';
+  txt += clientInfoText();
+  if(selectedSellerName()) txt += `Vendedor asignado: ${selectedSellerName()}\n`;
+  if(clientInfoText() || selectedSellerName()) txt += '\n';
+  let total=0;
+  items.forEach(p=>{
+    const sub=qty(p.SKU)*getPrice(p);
+    total+=sub;
+    txt += `• ${p.SKU} - ${p.Producto} x${qty(p.SKU)} = ${money(sub)}\n`;
+  });
+  txt += `\nTotal: ${money(total)}`;
+  return txt;
+}
+function orderText(){return encodeURIComponent(orderPlainText())}
+function sendWhatsApp(){
+  const items=cartItems();
+  if(!items.length){alert('Agregá productos al pedido antes de enviarlo.');return}
+  const phone=selectedSellerPhone();
+  if(!phone){alert('Elegí un vendedor antes de enviar el pedido.');return}
+  window.open(`https://wa.me/${phone}?text=${orderText()}`,'_blank')
+}
+function copyOrder(){navigator.clipboard.writeText(orderPlainText()); alert('Pedido copiado')}
+function downloadOrderExcel(){
+  const items=cartItems();
+  if(!items.length){alert('Agregá productos al pedido antes de descargarlo.');return}
+  let total=0;
+  const rows=[
+    ['Cliente / Local',(document.getElementById('clientName')?.value || '').trim()],
+    ['Vendedor',selectedSellerName()],
+    ['Observaciones',(document.getElementById('clientNote')?.value || '').trim()],
+    [],
+    ['SKU','Producto','Cantidad','Precio unitario','Subtotal']
+  ];
+  items.forEach(p=>{
+    const unit=getPrice(p);
+    const sub=qty(p.SKU)*unit;
+    total+=sub;
+    rows.push([p.SKU,p.Producto,qty(p.SKU),unit,sub]);
+  });
+  rows.push([]);
+  rows.push(['TOTAL','','','',total]);
+  const csv = rows.map(row => row.map(value => `"${String(value ?? '').replace(/"/g,'""')}"`).join(';')).join('\n');
+  const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `pedido-envases-devoto-${fecha}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function downloadCatalogPDF(){
+  // Genera el catálogo completo en vista de impresión.
+  // En la ventana que se abre, elegir “Guardar como PDF”.
+  const oldTitle = document.title;
+  pdfMode = true;
+  document.body.classList.add('pdf-mode');
+  document.title = 'catalogo-envases-devoto';
+  render();
+  setTimeout(() => { window.print(); }, 350);
+  const restore = () => {
+    pdfMode = false;
+    document.body.classList.remove('pdf-mode');
+    document.title = oldTitle;
+    render();
+    window.removeEventListener('afterprint', restore);
+  };
+  window.addEventListener('afterprint', restore);
+  setTimeout(restore, 2500);
+}
+
+function openConfig(){document.getElementById('sheetUrl').value=SHEET_URL; document.getElementById('configModal').classList.add('show')}
+function closeConfig(){document.getElementById('configModal').classList.remove('show')}
+function saveConfig(){SHEET_URL=document.getElementById('sheetUrl').value.trim(); localStorage.setItem('catalogSheetUrl',SHEET_URL); closeConfig(); load()}
+function loadDemo(){SHEET_URL=''; localStorage.removeItem('catalogSheetUrl'); closeConfig(); load()}
+
+function saveOrder(){
+  const items = cartItems();
+  if(!items.length){
+    alert('No hay productos para guardar.');
+    return;
+  }
+
+  const savedOrders = JSON.parse(localStorage.getItem('savedOrders') || '[]');
+
+  const order = {
+    fecha: new Date().toLocaleString('es-AR'),
+    vendedor: selectedSellerName(),
+    cliente: document.getElementById('clientName')?.value || '',
+    items: items.map(p => ({
+      sku:p.SKU,
+      producto:p.Producto,
+      cantidad:qty(p.SKU)
+    }))
+  };
+
+  savedOrders.push(order);
+  localStorage.setItem('savedOrders', JSON.stringify(savedOrders));
+
+  // estadísticas
+  const stats = JSON.parse(localStorage.getItem('productStats') || '{}');
+
+  items.forEach(p=>{
+    stats[p.Producto] = (stats[p.Producto] || 0) + qty(p.SKU);
+  });
+
+  localStorage.setItem('productStats', JSON.stringify(stats));
+
+  renderBestSellers();
+  alert('Pedido guardado correctamente');
+}
+
+
+function getProductStats(){
+  return JSON.parse(localStorage.getItem('productStats') || '{}');
+}
+
+function renderBestSellers(){
+  const box = document.getElementById('bestSellersBox');
+  const list = document.getElementById('bestSellersList');
+  if(!box || !list) return;
+
+  const entries = Object.entries(getProductStats())
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,6);
+
+  if(!entries.length){
+    box.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+
+  box.style.display = 'block';
+  list.innerHTML = entries.map(([name, units], index)=>`
+    <div class="best-seller-item">
+      <div class="best-seller-rank">${index+1}</div>
+      <div>
+        <div class="best-seller-name">${name}</div>
+        <div class="best-seller-units">${units} unidades pedidas</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showStats(){
+  const stats = JSON.parse(localStorage.getItem('productStats') || '{}');
+
+  const entries = Object.entries(stats)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,15);
+
+  if(!entries.length){
+    alert('Todavía no hay estadísticas.');
+    return;
+  }
+
+  let text = 'PRODUCTOS MÁS VENDIDOS\n\n';
+
+  entries.forEach((item,index)=>{
+    text += `${index+1}. ${item[0]} → ${item[1]} unidades\n`;
+  });
+
+  alert(text);
+}
+
+load();
+setTimeout(renderBestSellers, 500);
+</script>
+</body>
+</html>
