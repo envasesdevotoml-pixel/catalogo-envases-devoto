@@ -535,7 +535,7 @@ function pdfCard(p,isFeatured){
  return `<article class="pdf-card ${isFeatured?'pdf-featured':''}">
    <div class="product-photo">${photo}</div>
    <div class="product-primary"><div class="product-title"><span class="sku-tag">${safeHTML(p.SKU||'S/C')}</span><strong>${safeHTML(p.Producto||'Sin nombre')}</strong></div><div class="product-specs">${details}</div></div>
-   <div class="product-secondary">${bulto?'<div><b>Un. x bulto:</b> '+safeHTML(bulto)+'</div>':''}${barcode?'<div class="ean"><b>Cód. de barras:</b><span>'+safeHTML(barcode)+'</span></div>':''}</div>
+   <div class="product-secondary">${bulto?'<div><b>Un. x bulto:</b> '+safeHTML(bulto)+'</div>':''}${barcode?'<div class="ean"><b>EAN:</b><span>'+safeHTML(barcode)+'</span></div>':''}</div>
    <div class="product-sale"><div class="sale-price"><small>Precio x unidad</small><strong>${safeHTML(money(price))}</strong></div><div class="quantity-line"><span>CANT.</span><i aria-label="Espacio para anotar cantidad"></i></div></div>
  </article>`;
 }
@@ -595,7 +595,7 @@ function buildPrintDocument(selected){
  .catalog-heading{font-size:18px;line-height:1.08;letter-spacing:1.1px;font-weight:900;color:#111;text-align:right}
  .pdf-line{height:16mm;flex:none;display:flex;align-items:center;gap:3mm;border-bottom:.35mm solid #cba33b;padding:0 1mm 1.2mm}
  .line-title{font-size:20px;font-weight:900;text-transform:uppercase;line-height:1.05;max-width:50%;overflow-wrap:anywhere}
- .line-title::first-letter{color:#d9a723}
+ .line-title::first-letter{color:#101010}
  .line-subtitle{flex:1;padding-left:3mm;border-left:.3mm solid #d9a723;font-style:italic;font-size:9.7px;line-height:1.25;min-width:0}
  .line-category{border:1px solid #d4b15c;border-radius:3mm;padding:2mm;font-size:8px;font-weight:700;max-width:30mm;text-align:center}
  .pdf-products{display:grid;grid-template-rows:repeat(6,minmax(0,1fr));gap:0;flex:1;min-height:0}
@@ -630,7 +630,7 @@ function buildPrintDocument(selected){
  .pdf-page:not(.pdf-cover){background:#f1f7fc;color:#101010}
  .pdf-page:not(.pdf-cover) .pdf-header{border-bottom-color:#38a4dd}
  .pdf-page:not(.pdf-cover) .pdf-line{border-bottom-color:#38a4dd}
- .pdf-page:not(.pdf-cover) .line-title::first-letter{color:#329fd8}
+ .pdf-page:not(.pdf-cover) .line-title::first-letter{color:#101010}
  .pdf-page:not(.pdf-cover) .line-subtitle{border-left-color:#38a4dd}
  .pdf-page:not(.pdf-cover) .line-category{border-color:#8dbfdf;background:#e5f2fb;color:#185e87}
  .pdf-page:not(.pdf-cover) .catalog-heading{color:#278fca}
@@ -654,7 +654,7 @@ function buildPrintDocument(selected){
  .sku-tag{display:inline-block;font-size:9px;padding:.6mm 1mm;margin:0 1mm .7mm 0}
  .product-specs{font-size:11px;line-height:1.25;gap:.5mm}
  .product-secondary{grid-column:1/-1;grid-row:2;height:auto;border-left:0;border-top:.2mm solid #c6ddea;padding:.8mm 0 0;flex-direction:row;align-items:center;justify-content:space-between;gap:2mm;font-size:9.5px;line-height:1.15}
- .ean{display:flex;flex-direction:column;align-items:flex-start;gap:.3mm}.ean span{display:block;font-size:10px;white-space:nowrap}
+ .ean{display:flex;flex-direction:row;align-items:center;gap:1mm;white-space:nowrap}.ean span{display:inline;font-size:10px;white-space:nowrap}
  .product-sale{grid-column:1/-1;grid-row:3;flex-direction:row;align-items:center;justify-content:space-between;gap:3mm;padding:0 2mm}
  .sale-price{width:40mm;flex:none;border-radius:2mm}
  .sale-price small{font-size:7px;padding:.7mm .5mm}
