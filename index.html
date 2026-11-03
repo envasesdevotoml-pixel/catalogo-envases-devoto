@@ -566,9 +566,9 @@ function buildPrintDocument(selected){
  for(const entries of automatic.values())groups.push(entries.map(x=>x.p));
  const pages=[];
  for(const items of groups){
-  // Seis filas exactas como máximo por página, también en el PDF de destacados.
-  for(let i=0;i<items.length;i+=6){
-   const group=items.slice(i,i+6);const info=pdfLineInfo(group[0]);
+  // Ocho productos por página, también en el PDF de destacados.
+  for(let i=0;i<items.length;i+=8){
+   const group=items.slice(i,i+8);const info=pdfLineInfo(group[0]);
    const groupValue=(aliases,fallback)=>{
     // Conserva los títulos de la página aunque se reparta entre varias hojas.
     for(const product of items){const val=firstValue(product,aliases).trim();if(val)return val}return fallback;
@@ -642,6 +642,25 @@ function buildPrintDocument(selected){
  .pdf-page:not(.pdf-cover) .pdf-card{border-bottom-color:#c6ddea}
  .pdf-cover{padding:0;display:block;gap:0;overflow:hidden;background:#f1f7fc}
  .pdf-cover img{width:100%;height:100%;display:block;object-fit:contain;object-position:center;background:#f1f7fc}
+
+ /* Catálogo: dos columnas y cuatro filas, ocho productos por hoja. */
+ .pdf-products{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:2.5mm}
+ .pdf-page:not(.pdf-cover) .pdf-card{grid-template-columns:32mm minmax(0,1fr);grid-template-rows:minmax(0,1fr) 5mm 11mm;gap:1mm 2mm;align-items:stretch;border:.25mm solid #94c9e6;border-radius:2.5mm;padding:2mm;background:#fff}
+ .product-photo{grid-column:1;grid-row:1;max-height:none;background:#fff}
+ .product-photo .single-photo{width:100%;height:100%;aspect-ratio:auto}
+ .product-primary{grid-column:2;grid-row:1;gap:1mm;justify-content:center}
+ .product-title{display:block;line-height:1.2}
+ .product-title strong{font-size:11.5px;line-height:1.2}
+ .sku-tag{display:inline-block;font-size:9px;padding:.6mm 1mm;margin:0 1mm .7mm 0}
+ .product-specs{font-size:9.5px;line-height:1.22;gap:.5mm}
+ .product-secondary{grid-column:1/-1;grid-row:2;height:auto;border-left:0;border-top:.2mm solid #c6ddea;padding:.8mm 0 0;flex-direction:row;align-items:center;justify-content:space-between;gap:2mm;font-size:8px;line-height:1.1}
+ .ean{display:flex;align-items:center;gap:1mm}.ean span{display:inline;font-size:8px;white-space:nowrap}
+ .product-sale{grid-column:1/-1;grid-row:3;flex-direction:row;align-items:center;justify-content:space-between;gap:3mm;padding:0 2mm}
+ .sale-price{width:40mm;flex:none;border-radius:2mm}
+ .sale-price small{font-size:7px;padding:.7mm .5mm}
+ .sale-price strong{font-size:17px;padding:1mm 0}
+ .quantity-line{font-size:8px;gap:2mm}.quantity-line i{width:14mm;height:8mm;border-radius:2mm}
+ .pdf-page:not(.pdf-cover) .pdf-featured{background:#e2f2fd;border-left:.9mm solid #329fd8}
 
   .printbtn{position:fixed;right:16px;bottom:16px;border:0;border-radius:10px;padding:14px 18px;background:#161616;color:white;cursor:pointer;box-shadow:0 5px 20px #0004;font-weight:700}
  @media print{body{background:#fff}.pdf-page{margin:0;box-shadow:none;break-after:page}.pdf-page:last-of-type{break-after:auto}.printbtn{display:none}}
