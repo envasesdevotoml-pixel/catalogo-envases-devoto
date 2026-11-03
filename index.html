@@ -432,8 +432,79 @@ function closeFeaturedManager(){document.getElementById('featuredModal').classLi
 function clearFeaturedManager(){pdfFeaturedSkus.clear();localStorage.setItem('catalogFeaturedSkus','[]');renderFeaturedManager()}
 function setFeaturedSKU(sku,on){if(on)pdfFeaturedSkus.add(sku);else pdfFeaturedSkus.delete(sku);localStorage.setItem('catalogFeaturedSkus',JSON.stringify([...pdfFeaturedSkus]));renderFeaturedManager()}
 function renderFeaturedManager(){const q=document.getElementById('featuredSearch').value.toLowerCase();const chosen=products.filter(p=>String(p.Activo||'SI').toUpperCase()!=='NO').filter(p=>(String(p.Producto||'')+' '+String(p.SKU||'')).toLowerCase().includes(q));const root=document.getElementById('featuredChoices');root.replaceChildren();chosen.forEach(p=>{const lab=document.createElement('label');lab.style.cssText='display:flex;gap:12px;align-items:center;padding:11px;border-bottom:1px solid #e4e4e4;cursor:pointer';const cb=document.createElement('input');cb.type='checkbox';cb.checked=featured(p);cb.addEventListener('change',()=>setFeaturedSKU(String(p.SKU||''),cb.checked));const span=document.createElement('span');span.textContent=(p.SKU||'')+' — '+(p.Producto||'Producto')+( /^(si|sí|yes|1|true|x)$/i.test(firstValue(p,['Destacado']).trim()) ? ' (marcado en Sheets)' : '');lab.append(cb,span);root.append(lab)});if(!chosen.length)root.textContent='No se encontraron productos.'}
-function pdfCard(p,isFeatured){const imgs=productImages(p);const photo=imgs[0] ? '<img alt="" src="'+safeHTML(imgs[0])+'">' : '<span class="fallback">SIN FOTO</span>';const price=getPrice(p);const desc=firstValue(p,['Descripcion','Descripción','Detalle','Caracteristicas','Características']);const med=firstValue(p,['Medida','Medidas','Dimensiones']);return `<article class="pdf-card ${isFeatured?'pdf-featured':''}">${isFeatured?'<div class="star">★ PRODUCTO DESTACADO</div>':''}<div class="photo">${photo}</div><div class="details"><div class="sku">${safeHTML(p.SKU||'')}</div><h3>${safeHTML(p.Producto||'Sin nombre')}</h3>${desc?`<p>${safeHTML(desc)}</p>`:''}${med?`<p><b>Medidas:</b> ${safeHTML(med)}</p>`:''}<div class="price">${safeHTML(money(price))}</div></div></article>`}
-function buildPrintDocument(selected){const byCategory=new Map();for(const p of selected){const cat=String(p.Categoria||'Productos');if(!byCategory.has(cat))byCategory.set(cat,[]);byCategory.get(cat).push(p)}let pages=[];let pageNo=0;for(const [cat,items] of byCategory){const groups=new Map();for(const p of items){const sec=String(p.Seccion||'General');if(!groups.has(sec))groups.set(sec,[]);groups.get(sec).push(p)}for(const [section,sectionItems] of groups){const feats=sectionItems.filter(featured), normal=sectionItems.filter(p=>!featured(p));const ordered=[...feats,...normal];let pos=0;while(pos<ordered.length){const part=[];let used=0;while(pos<ordered.length){const p=ordered[pos], cost=featured(p)?2:1;if(part.length&&used+cost>6)break;part.push(p);used+=cost;pos++}pageNo++;pages.push(`<section class="pdf-page"><header class="pdf-head"><div><strong>ENVASES <span>DEVOTO</span></strong><small>CATÁLOGO MAYORISTA</small></div><div class="right">${safeHTML(cat)}<small>${safeHTML(section)}</small></div></header><div class="pdf-grid">${part.map(p=>pdfCard(p,featured(p))).join('')}</div><footer>Envases Devoto · Industria Argentina <span>Página ${pageNo}</span></footer></section>`)}}}return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Catálogo mayorista — Envases Devoto</title><style>@page{size:A4;margin:0}*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;background:#e7e7e7;color:#222;margin:0}.pdf-page{background:white;width:210mm;height:297mm;margin:12px auto;padding:14mm 12mm 13mm;display:flex;flex-direction:column;break-after:page;page-break-after:always;overflow:hidden}.pdf-head{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #e5a500;padding-bottom:9px;margin-bottom:12px}.pdf-head strong{font-size:23px;letter-spacing:1px}.pdf-head strong span{color:#168bd0}.pdf-head small{display:block;font-size:10px;letter-spacing:1px;color:#666;margin-top:4px}.right{text-align:right;font-size:14px;font-weight:bold}.pdf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:min-content;gap:11px;align-content:start;flex:1}.pdf-card{border:1px solid #e4e8eb;border-radius:9px;overflow:hidden;break-inside:avoid;page-break-inside:avoid;min-height:72mm;display:flex;flex-direction:column}.pdf-card .photo{height:42mm;display:flex;justify-content:center;align-items:center;padding:7px;background:white}.photo img{max-width:100%;max-height:100%;object-fit:contain}.fallback{color:#aaa;font-size:12px}.details{padding:7px 11px 11px}.details .sku{font-size:9px;color:#168bd0;font-weight:bold;letter-spacing:1px}.details h3{font-size:13px;margin:4px 0 6px;line-height:1.15}.details p{font-size:10px;line-height:1.35;color:#555;margin:4px 0}.price{color:#168b49;font-size:14px;font-weight:800;margin-top:8px}.pdf-featured{grid-column:span 2;min-height:104mm;border:2px solid #d9a320;display:grid;grid-template-columns:46% 54%;grid-template-rows:auto 1fr;position:relative}.pdf-featured .star{grid-column:span 2;background:#fff3cb;color:#805900;font-size:10px;font-weight:bold;padding:7px 11px;letter-spacing:1px}.pdf-featured .photo{height:90mm;padding:10px}.pdf-featured .details{padding:15px;align-self:center}.pdf-featured .details h3{font-size:21px}.pdf-featured .details p{font-size:12px}.pdf-featured .price{font-size:21px}footer{margin-top:auto;padding-top:12px;border-top:1px solid #ddd;color:#888;font-size:9px;display:flex;justify-content:space-between}@media print{body{background:white}.pdf-page{margin:0;box-shadow:none;break-after:page}}@media screen{.pdf-page{box-shadow:0 8px 25px #0002}}.printbtn{position:fixed;right:22px;bottom:22px;background:#168bd0;color:white;border:0;border-radius:12px;padding:14px 20px;cursor:pointer;font-size:16px;box-shadow:0 5px 20px #0003}@media print{.printbtn{display:none}}</style></head><body>${pages.join('')}<button class="printbtn" onclick="window.print()">Guardar como PDF / Imprimir</button><script>window.addEventListener('load',async()=>{const images=[...document.images];await Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,8000)})));});<\/script></body></html>`}
+function pdfCard(p,isFeatured){
+ const imgs=productImages(p);
+ const photo=imgs[0] ? '<img alt="" src="'+safeHTML(imgs[0])+'">' : '<span class="fallback">SIN FOTO</span>';
+ const price=getPrice(p);
+ const desc=firstValue(p,['Descripcion','Descripción','Detalle','Caracteristicas','Características']);
+ const med=firstValue(p,['Medida','Medidas','Dimensiones']);
+ const sec=String(p.Seccion||'General');
+ return `<article class="pdf-card ${isFeatured?'pdf-featured':''}">
+ ${isFeatured?'<div class="star">★ PRODUCTO DESTACADO</div>':''}
+ <div class="photo">${photo}</div>
+ <div class="details"><div class="eyebrow">${safeHTML(sec)}</div><div class="sku">${safeHTML(p.SKU||'')}</div>
+ <h3>${safeHTML(p.Producto||'Sin nombre')}</h3>
+ ${desc?`<p class="description">${safeHTML(desc)}</p>`:''}
+ ${med?`<p class="measure">Medidas: ${safeHTML(med)}</p>`:''}
+ <div class="price">${safeHTML(money(price))}</div></div></article>`;
+}
+function buildPrintDocument(selected){
+ // Una página A4 admite hasta 12 posiciones: 3 columnas por 4 filas.
+ // Un destacado usa dos posiciones, pero sigue ocupando una sola fila.
+ // No se inicia una página nueva al cambiar de sección; la sección figura en cada ficha.
+ const byCategory=new Map();
+ for(const p of selected){const cat=String(p.Categoria||'Productos');if(!byCategory.has(cat))byCategory.set(cat,[]);byCategory.get(cat).push(p)}
+ let pages=[],pageNo=0;
+ for(const [cat,items] of byCategory){
+   // Conservar el orden del catálogo (Orden/Seccion) y los destacados elegidos.
+   let pos=0;
+   while(pos<items.length){
+     const part=[];let slots=0;
+     while(pos<items.length){
+       const p=items[pos],cost=featured(p)?2:1;
+       // Evitar que el destacado atraviese el final de una fila de 3 columnas.
+       const remainder=slots%3;
+       const blank=(cost===2&&remainder===2)?1:0;
+       if(part.length&&slots+blank+cost>12)break;
+       if(blank){part.push(null);slots++;}
+       part.push(p);slots+=cost;pos++;
+     }
+     pageNo++;
+     pages.push(`<section class="pdf-page"><header class="pdf-head"><div><strong>ENVASES <span>DEVOTO</span></strong><small>CATÁLOGO MAYORISTA</small></div><div class="right">${safeHTML(cat)}<small>Productos y precios mayoristas</small></div></header><div class="pdf-grid">${part.map(p=>p?pdfCard(p,featured(p)):'<div class="grid-placeholder"></div>').join('')}</div><footer>Envases Devoto · Industria Argentina <span>Página ${pageNo}</span></footer></section>`);
+   }
+ }
+ return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Catálogo mayorista — Envases Devoto</title><style>
+ @page{size:A4;margin:0}
+ *{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;background:#e7e7e7;color:#222;margin:0}
+ .pdf-page{background:white;width:210mm;height:297mm;margin:12px auto;padding:10mm 9mm 9mm;display:flex;flex-direction:column;break-after:page;page-break-after:always;overflow:hidden}
+ .pdf-head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #e5a500;padding-bottom:6px;margin-bottom:7px;min-height:18mm}
+ .pdf-head strong{font-size:20px;letter-spacing:.6px}.pdf-head strong span{color:#168bd0}
+ .pdf-head small{display:block;font-size:8px;letter-spacing:.7px;color:#666;margin-top:3px}
+ .right{text-align:right;font-size:12px;font-weight:bold}
+ .pdf-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(4,58mm);grid-auto-rows:58mm;gap:3mm;align-content:start;flex:1}
+ .pdf-card{border:1px solid #e2e7e9;border-radius:6px;overflow:hidden;break-inside:avoid;page-break-inside:avoid;display:flex;flex-direction:column;min-width:0;min-height:0;background:#fff}
+ .pdf-card .photo{height:30mm;flex:none;display:flex;justify-content:center;align-items:center;padding:3mm 3mm 1mm;background:white;min-width:0}
+ .photo img{max-width:100%;max-height:100%;object-fit:contain}.fallback{color:#aaa;font-size:10px}
+ .details{padding:1.5mm 2.2mm 2mm;min-width:0;flex:1;display:flex;flex-direction:column;overflow:hidden}
+ .eyebrow{font-size:7px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1mm}
+ .details .sku{font-size:8px;color:#168bd0;font-weight:bold;letter-spacing:.4px}
+ .details h3{font-size:10.6px;margin:1.2mm 0 1mm;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ .details p{font-size:8px;line-height:1.2;color:#555;margin:1mm 0;overflow:hidden}
+ .details .description{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+ .details .measure{white-space:nowrap;text-overflow:ellipsis}
+ .price{color:#168b49;font-size:12px;font-weight:800;margin-top:auto;padding-top:1mm}
+ .pdf-featured{grid-column:span 2;border:2px solid #d9a320;display:grid;grid-template-columns:43% 57%;grid-template-rows:8mm 1fr}
+ .pdf-featured .star{grid-column:span 2;background:#fff3cb;color:#805900;font-size:9px;font-weight:bold;padding:2.5mm 3mm;letter-spacing:.5px}
+ .pdf-featured .photo{height:48mm;padding:3mm}.pdf-featured .details{padding:4mm;align-self:stretch}
+ .pdf-featured .details h3{font-size:14px;-webkit-line-clamp:3}.pdf-featured .details p{font-size:9px}
+ .pdf-featured .price{font-size:16px}.pdf-featured .eyebrow{font-size:8px}
+ footer{margin-top:auto;padding-top:5px;border-top:1px solid #ddd;color:#888;font-size:8px;display:flex;justify-content:space-between}
+ @media print{body{background:white}.pdf-page{margin:0;box-shadow:none;break-after:page} .pdf-page:last-of-type{break-after:auto}}
+ @media screen{.pdf-page{box-shadow:0 8px 25px #0002}}
+ .printbtn{position:fixed;right:22px;bottom:22px;background:#168bd0;color:white;border:0;border-radius:12px;padding:14px 20px;cursor:pointer;font-size:16px;box-shadow:0 5px 20px #0003}
+ @media print{.printbtn{display:none}}
+ </style></head><body>${pages.join('')}<button class="printbtn" onclick="window.print()">Guardar como PDF / Imprimir</button><script>window.addEventListener('load',async()=>{const images=[...document.images];await Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,8000)})));});<\/script></body></html>`;
+}
 function downloadCatalogPDF(){const selected=products.filter(p=>String(p.Activo||'SI').toUpperCase()!=='NO').sort((a,b)=>(Number(a.Orden)||9999)-(Number(b.Orden)||9999));if(!selected.length){alert('No hay productos para exportar.');return}const html=buildPrintDocument(selected);const blob=new Blob([html],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const win=window.open(url,'_blank');if(!win){const link=document.createElement('a');link.href=url;link.download='catalogo-para-pdf.html';link.click();alert('El navegador bloqueó la ventana. Abrí el archivo descargado y elegí Imprimir → Guardar como PDF.')}setTimeout(()=>URL.revokeObjectURL(url),60000)}
 
 function openConfig(){document.getElementById('sheetUrl').value=SHEET_URL; document.getElementById('configModal').classList.add('show')}
