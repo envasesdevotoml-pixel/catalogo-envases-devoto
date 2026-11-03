@@ -457,8 +457,7 @@ function pdfCard(p,isFeatured){
  ].filter(Boolean).join('');
  return `<article class="pdf-card ${isFeatured?'pdf-featured':''}">
    <div class="product-photo">${photo}</div>
-   <div class="product-primary"><div class="product-title"><span class="sku-tag">${safeHTML(p.SKU||'S/C')}</span><strong>${safeHTML(p.Producto||'Sin nombre')}</strong></div><div class="product-specs">${details}</div></div>
-   <div class="product-secondary">${bulto?'<div><b>Un. x bulto:</b> '+safeHTML(bulto)+'</div>':''}${barcode?'<div class="ean"><b>Cód. de barras:</b><span>'+safeHTML(barcode)+'</span></div>':''}</div>
+   <div class="product-primary"><div class="product-title"><span class="sku-tag">${safeHTML(p.SKU||'S/C')}</span><strong>${safeHTML(p.Producto||'Sin nombre')}</strong></div><div class="product-specs">${details}</div><div class="product-identifiers">${bulto?'<span><b>Un. x bulto:</b> '+safeHTML(bulto)+'</span>':''}${barcode?'<span><b>Cód. de barras:</b> '+safeHTML(barcode)+'</span>':''}</div></div>
    <div class="product-sale"><div class="sale-price"><small>PRECIO MAYORISTA</small><strong>${safeHTML(money(price))}</strong></div><div class="quantity-line"><span>CANT.</span><i aria-label="Espacio para anotar cantidad"></i></div></div>
  </article>`;
 }
@@ -522,18 +521,18 @@ function buildPrintDocument(selected){
  .line-subtitle{flex:1;padding-left:3mm;border-left:.3mm solid #d9a723;font-style:italic;font-size:9.7px;line-height:1.25;min-width:0}
  .line-category{border:1px solid #d4b15c;border-radius:3mm;padding:2mm;font-size:8px;font-weight:700;max-width:30mm;text-align:center}
  .pdf-products{display:grid;grid-template-rows:repeat(6,minmax(0,1fr));gap:0;flex:1;min-height:0}
- .pdf-card{display:grid;grid-template-columns:65mm minmax(0,1fr) 27mm 34mm;column-gap:2mm;align-items:center;border-bottom:.3mm solid #b7b7b7;padding:1.1mm .4mm;min-height:0;break-inside:avoid;page-break-inside:avoid}
+ .pdf-card{display:grid;grid-template-columns:62mm minmax(0,1fr) 34mm;column-gap:2mm;align-items:center;border-bottom:.3mm solid #b7b7b7;padding:1.1mm .4mm;min-height:0;break-inside:avoid;page-break-inside:avoid}
  .pdf-card:last-child{border-bottom:0}
  .product-photo{height:100%;min-height:0;max-height:35mm;width:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff}
  .product-photo img{width:100%;height:100%;object-fit:contain;object-position:center;display:block}.product-photo .single-photo{max-width:100%;width:auto;aspect-ratio:1/1}.photo-pair{display:grid;grid-template-columns:1fr 1fr;gap:1mm;width:100%;height:100%;align-items:center}.photo-pair img{aspect-ratio:1/1;max-height:31mm;min-width:0}
  .fallback{font-size:8px;color:#777}
- .product-primary{height:100%;display:flex;flex-direction:column;justify-content:center;gap:1.5mm;min-width:0;overflow-wrap:anywhere}
- .product-title{display:flex;align-items:flex-start;gap:1.5mm;line-height:1.12}
- .product-title strong{font-size:12px;line-height:1.15;min-width:0}
- .sku-tag{background:#181818;color:white;padding:1mm 1.4mm;border-radius:1mm;white-space:nowrap;font-size:9px;line-height:1.05;font-weight:900}
- .product-specs{font-size:9px;line-height:1.28;display:flex;flex-direction:column;gap:.7mm;color:#3c3c3c;min-width:0}
+ .product-primary{height:100%;display:flex;flex-direction:column;justify-content:center;gap:1.5mm;min-width:0;overflow-wrap:break-word;padding-right:1.5mm}
+ .product-title{display:flex;align-items:baseline;flex-wrap:wrap;gap:1.5mm;line-height:1.18}
+ .product-title strong{font-size:14px;line-height:1.18;min-width:0}
+ .sku-tag{background:#181818;color:white;padding:1mm 1.4mm;border-radius:1mm;white-space:nowrap;font-size:10px;line-height:1.1;font-weight:900}
+ .product-specs{font-size:11.2px;line-height:1.28;display:flex;flex-direction:column;gap:.65mm;color:#3c3c3c;min-width:0}
  .product-specs b{color:#161616}
- .product-specs .text-detail{color:#4d4d4d}
+ .product-specs .text-detail{color:#4d4d4d}\n .product-identifiers{display:flex;flex-wrap:wrap;gap:1mm 3mm;padding-top:1mm;border-top:.2mm dashed #bbb;font-size:9.7px;line-height:1.2;color:#454545}\n .product-identifiers b{color:#161616}
  .product-secondary{height:72%;min-width:0;border-left:.3mm dashed #bababa;padding-left:2.5mm;display:flex;flex-direction:column;justify-content:center;gap:1.7mm;font-size:9px;line-height:1.2;overflow-wrap:anywhere}
  .swatches{display:inline-flex;vertical-align:middle;gap:1.2mm;margin-left:1mm}
  .swatch{width:4mm;height:4mm;border-radius:50%;border:.2mm solid #aaa;display:inline-block}
