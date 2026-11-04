@@ -284,7 +284,7 @@ nav button.active{color:#167fb8;border-bottom-color:#329fda;background:#eaf5fc}
   <label for="clientNote">Observaciones</label>
   <textarea id="clientNote" placeholder="Dirección, forma de pago, datos de entrega, etc."></textarea>
 </div><div id="summaryItems"></div><div class="summary-total"><span>Total</span><strong id="summaryTotal">$ 0</strong></div><div class="summary-actions"><button class="btn btn-green" onclick="sendWhatsApp()">Enviar pedido por WhatsApp</button><button class="btn btn-blue" onclick="downloadOrderExcel()">Descargar pedido en Excel</button><button class="btn btn-light" onclick="copyOrder()">Copiar pedido</button></div></aside>
-<div class="modal" id="configModal"><div class="modal-card"><button class="close" onclick="closeConfig()">×</button><h2>Conectar Google Sheets</h2><p class="help">Pegá el link CSV publicado de Google Sheets. La página la guarda en este navegador. Después solo editás la planilla y el catálogo se actualiza al recargar.</p><input id="sheetUrl" placeholder="https://opensheet.elk.sh/ID_DEL_SHEET/Productos"><button class="btn btn-green" onclick="saveConfig()">Guardar y cargar catálogo</button><button class="btn btn-light" onclick="loadDemo()">Usar demo local</button><p class="help"><b>Columnas esperadas:</b> Activo, Categoria, Seccion, SKU, Producto, Descripcion, Medida, Precio, ImagenURL, ImagenURL2, CodigoBarra, EtiquetasIncluidas, Orden, Página PDF, Orden PDF, Título PDF, Subtítulo PDF, Etiqueta PDF, Destacado PDF, Unidades por bulto.</p></div></div>
+<div class="modal" id="configModal"><div class="modal-card"><button class="close" onclick="closeConfig()">×</button><h2>Conectar Google Sheets</h2><p class="help">Pegá el link CSV publicado de Google Sheets. La página la guarda en este navegador. Después solo editás la planilla y el catálogo se actualiza al recargar.</p><input id="sheetUrl" placeholder="https://opensheet.elk.sh/ID_DEL_SHEET/Productos"><button class="btn btn-green" onclick="saveConfig()">Guardar y cargar catálogo</button><button class="btn btn-light" onclick="loadDemo()">Usar demo local</button><p class="help"><b>Columnas esperadas:</b> Activo, Categoria, Seccion, SKU, Producto, Descripcion, Medida, Precio, ImagenURL, ImagenURL2, CodigoBarra, EtiquetasIncluidas, Orden, Página PDF, Orden PDF, Título PDF, Subtítulo PDF, Etiqueta PDF, Destacado PDF, Unidades por bulto, Cantidad de divisiones.</p></div></div>
 <script>
 const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS-1cWV4vv5RHwzD2FaPTZCKVS8KdJw4csZaYsqNt0OQtYb9Ef7qqwgCjvyG6WxGWz6RVzXPAP-ZwOK/pub?gid=805595643&single=true&output=csv';
 let SHEET_URL = localStorage.getItem('catalogSheetUrl') || DEFAULT_SHEET_URL;
@@ -382,6 +382,10 @@ function firstValue(p, names){
   return '';
 }
 
+function getDivisions(p){
+  return firstValue(p,['Cantidad de divisiones','CantidadDeDivisiones','Divisiones']).trim();
+}
+
 function getPrice(p){
   return cleanPrice(firstValue(p,[
     'Precio','PRECIO','precio',
@@ -430,7 +434,7 @@ return `<article class="card"><div class="photo" onclick="inc('${p.SKU}')">${ima
   <div class="barcode-label">Código de barras</div>
   <div class="barcode-number">${barcode}</div>
 </div>
-<div class="name">${p.Producto||''}</div>${cleanDesc?`<div class="desc">${cleanDesc}</div>`:''}${p.Medida?`<div class="meta">Medida: ${p.Medida}</div>`:''}${(p.EtiquetasIncluidas||'').toUpperCase()==='SI'?`<div class="tag">Incluye etiquetas con nombres de especias</div>`:''}<div class="price">${money(price)}</div><div class="controls"><button onclick="inc('${p.SKU}',-1)">−</button><input type="number" min="0" value="${q}" onchange="setQty('${p.SKU}',this.value)"><button onclick="inc('${p.SKU}',1)">+</button><span class="subtotal">${q?money(q*price):''}</span></div></div></article>`}
+<div class="name">${p.Producto||''}</div>${cleanDesc?`<div class="desc">${cleanDesc}</div>`:''}${p.Medida?`<div class="meta">Medida: ${p.Medida}</div>`:''}${getDivisions(p)?`<div class="meta"><b>Divisiones:</b> ${safeHTML(getDivisions(p))}</div>`:''}${(p.EtiquetasIncluidas||'').toUpperCase()==='SI'?`<div class="tag">Incluye etiquetas con nombres de especias</div>`:''}<div class="price">${money(price)}</div><div class="controls"><button onclick="inc('${p.SKU}',-1)">−</button><input type="number" min="0" value="${q}" onchange="setQty('${p.SKU}',this.value)"><button onclick="inc('${p.SKU}',1)">+</button><span class="subtotal">${q?money(q*price):''}</span></div></div></article>`}
 function renderTotals(rebuildSummary=true){let total=0,count=0; products.forEach(p=>{const q=qty(p.SKU); if(q){total+=q*getPrice(p); count+=q}}); document.getElementById('topTotal').textContent=money(total); document.getElementById('summaryTotal').textContent=money(total); if(rebuildSummary) renderSummary()}
 function renderSummary(){const wrap=document.getElementById('summaryItems'); const items=products.filter(p=>qty(p.SKU)); if(!items.length){wrap.innerHTML='<div class="empty">Todavía no agregaste productos.</div>';return} wrap.innerHTML=items.map(p=>`<div class="summary-row"><div><b>${p.SKU}</b> · ${p.Producto}</div><div>x${qty(p.SKU)}</div><div>${money(qty(p.SKU)*getPrice(p))}</div></div>`).join('')}
 function toggleSummary(){document.getElementById('summary').classList.toggle('show'); renderSummary()}
@@ -515,6 +519,7 @@ function pdfCard(p,isFeatured){
  const price=getPrice(p);
  const desc=firstValue(p,['Descripcion','Descripción','Detalle','Caracteristicas','Características']).trim();
  const med=firstValue(p,['Medida','Medidas','Dimensiones']).trim();
+ const divisions=getDivisions(p);
  const cap=firstValue(p,['Capacidad','Contenido','Cantidad de frascos','Cantidad de tubos']).trim();
  const extra=firstValue(p,['Incluye','Observaciones','Nota','Información adicional']).trim() || (/^(si|sí)$/i.test(String(p.EtiquetasIncluidas||'').trim())?'Incluye etiquetas con nombres de especias':'');
  const barcode=firstValue(p,['CodigoBarra','Código de barras','Codigo de Barras','Código de Barras','CodigoBarras','EAN','GTIN']);
@@ -528,6 +533,7 @@ function pdfCard(p,isFeatured){
  const details=[
    materialLabel?'<div><b>Material:</b> '+safeHTML(materialLabel)+'</div>':'',
    med?'<div><b>Medidas:</b> '+safeHTML(med)+'</div>':'',
+   divisions?'<div><b>Divisiones:</b> '+safeHTML(divisions)+'</div>':'',
    cleanCap?'<div><b>Capacidad:</b> '+safeHTML(cleanCap)+'</div>':'',
    otherDesc?'<div class="text-detail">'+safeHTML(otherDesc)+'</div>':'',
    extra?'<div class="text-detail">'+safeHTML(extra)+'</div>':''
@@ -695,3 +701,4 @@ load();
 </script>
 </body>
 </html>
+
