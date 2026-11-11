@@ -275,9 +275,7 @@ nav button.active{color:#167fb8;border-bottom-color:#329fda;background:#eaf5fc}
 <aside class="summary" id="summary"><button class="close" onclick="toggleSummary()">×</button><h2>Mi Pedido</h2><div class="order-fields">
   <label for="sellerSelect">Vendedor</label>
   <select id="sellerSelect">
-    <option value="5491158845921">Pablo</option>
     <option value="5491165109886">Sofia</option>
-    <option value="5491140454208">Alejandro</option>
   </select>
   <label for="clientName">Cliente / Local</label>
   <input id="clientName" placeholder="Nombre del cliente o negocio">
@@ -319,7 +317,7 @@ function cleanPrice(v){
   return Number(s) || 0;
 }
 function qty(sku){return Number(cart[sku]||0)}
-function setQty(sku, value){value=Math.max(0,Number(value)||0); if(value){cart[sku]=value}else{delete cart[sku]} localStorage.setItem('catalogCart',JSON.stringify(cart)); renderTotals(); render();}
+function setQty(sku, value){const previous=qty(sku);value=Math.max(0,Number(value)||0); if(value){cart[sku]=value}else{delete cart[sku]} localStorage.setItem('catalogCart',JSON.stringify(cart)); renderTotals(); render();if(value>previous) openSummary();}
 function inc(sku, delta=1){setQty(sku, qty(sku)+delta)}
 function clearCart(){if(confirm('Vaciar todo el pedido?')){cart={};localStorage.setItem('catalogCart','{}');renderTotals();render();}}
 function parseCSV(text){
@@ -437,6 +435,7 @@ return `<article class="card"><div class="photo" onclick="inc('${p.SKU}')">${ima
 <div class="name">${p.Producto||''}</div>${cleanDesc?`<div class="desc">${cleanDesc}</div>`:''}${p.Medida?`<div class="meta">Medida: ${p.Medida}</div>`:''}${getDivisions(p)?`<div class="meta"><b>Divisiones:</b> ${safeHTML(getDivisions(p))}</div>`:''}${(p.EtiquetasIncluidas||'').toUpperCase()==='SI'?`<div class="tag">Incluye etiquetas con nombres de especias</div>`:''}<div class="price">${money(price)}</div><div class="controls"><button onclick="inc('${p.SKU}',-1)">−</button><input type="number" min="0" value="${q}" onchange="setQty('${p.SKU}',this.value)"><button onclick="inc('${p.SKU}',1)">+</button><span class="subtotal">${q?money(q*price):''}</span></div></div></article>`}
 function renderTotals(rebuildSummary=true){let total=0,count=0; products.forEach(p=>{const q=qty(p.SKU); if(q){total+=q*getPrice(p); count+=q}}); document.getElementById('topTotal').textContent=money(total); document.getElementById('summaryTotal').textContent=money(total); if(rebuildSummary) renderSummary()}
 function renderSummary(){const wrap=document.getElementById('summaryItems'); const items=products.filter(p=>qty(p.SKU)); if(!items.length){wrap.innerHTML='<div class="empty">Todavía no agregaste productos.</div>';return} wrap.innerHTML=items.map(p=>`<div class="summary-row"><div><b>${p.SKU}</b> · ${p.Producto}</div><div>x${qty(p.SKU)}</div><div>${money(qty(p.SKU)*getPrice(p))}</div></div>`).join('')}
+function openSummary(){document.getElementById('summary').classList.add('show');renderSummary()}
 function toggleSummary(){document.getElementById('summary').classList.toggle('show'); renderSummary()}
 function cartItems(){return products.filter(p=>qty(p.SKU))}
 function selectedSellerPhone(){return document.getElementById('sellerSelect')?.value || ''}
@@ -754,8 +753,9 @@ function openConfig(){document.getElementById('sheetUrl').value=SHEET_URL; docum
 function closeConfig(){document.getElementById('configModal').classList.remove('show')}
 function saveConfig(){SHEET_URL=document.getElementById('sheetUrl').value.trim(); localStorage.setItem('catalogSheetUrl',SHEET_URL); closeConfig(); load()}
 function loadDemo(){SHEET_URL=''; localStorage.removeItem('catalogSheetUrl'); closeConfig(); load()}
-load();
+load().then(()=>{renderTotals();if(cartItems().length)openSummary()});
 </script>
 </body>
 </html>
+
 
