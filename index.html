@@ -485,6 +485,7 @@ function productFacts(p){
  add('Capacidad',capacity);
  add('Divisiones',divisions);
  add('Medidas',firstValue(p,['Medida','Medidas','Dimensiones']));
+ add('Fibroplus',firstValue(p,['Fibroplus','Material']));
  return {facts,description:other};
 }
 function card(p){
