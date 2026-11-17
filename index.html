@@ -493,31 +493,7 @@ function productFullName(p){
 function productTitleHTML(p){
  const product=firstValue(p,['Producto','Nombre']);
  const model=productModel(p);
- const normalize=value=>value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ');
- const section=normalize(firstValue(p,['Seccion','Sección']));
- // Solo omitir el tipo cuando el encabezado identifica la misma familia.
- const families=[
-   [/^especieros?(?:\s|$)/,/^especiero(?:\s|$)/],
-   [/^cajas? de te(?:\s|$)/,/^caja de te(?:\s|$)/],
-   [/^fanales?(?:\s|$)/,/^fanal(?:\s|$)/],
-   [/^floreros?(?:\s|$)/,/^florero(?:\s|$)/],
-   [/^porta llaves?(?:\s|$)/,/^porta llaves?(?:\s|$)/],
-   [/^lamparas? de sal(?:\s|$)/,/^lampara de sal(?:\s|$)/],
-   [/^veladores? de mesa(?:\s|$)/,/^velador(?:\s|$)/],
-   [/^lamparas? de techo(?:\s|$)/,/^lampara de techo(?:\s|$)/],
-   [/^difusores? aromaticos?(?:\s|$)/,/^difusor(?:\s|$)/],
-   [/^porta sahumerios?(?:\s|$)/,/^porta sahumerios?(?:\s|$)/],
-   [/^hornitos? electrico/,/^hornito electrico(?:\s|$)/]
- ];
- const family=families.find(([sectionPattern,productPattern])=>sectionPattern.test(section)&&productPattern.test(normalize(product)));
- let main=product,secondary=model;
- if(model&&family){
-   main=model;
-   // Cortar por palabras conserva las tildes y el texto original del subtipo.
-   const prefix=normalize(product).match(family[1])[0].trim();
-   secondary=product.trim().split(/\s+/).slice(prefix.split(' ').length).join(' ');
- }
- return `<div class="name"><span class="product-type">${safeHTML(main)}</span><span class="product-model">${safeHTML(secondary)}</span></div>`;
+ return `<div class="name"><span class="product-type">${safeHTML(product)}</span><span class="product-model">${safeHTML(model)}</span></div>`;
 }
 function alignProductTitles(){
  document.querySelectorAll('#catalog .grid').forEach(grid=>{
