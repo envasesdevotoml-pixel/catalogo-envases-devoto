@@ -263,14 +263,13 @@ body.pdf-mode .order-bubble{display:none!important}
 .card .name{font-size:18px;line-height:1.25;min-height:2.5em;overflow-wrap:anywhere}
 .product-type{display:block;font-weight:800}
 .product-model{display:block;font-size:.85em;font-weight:600;color:var(--muted);line-height:1.3;margin-top:3px;min-height:1.3em}
-.product-facts{display:grid;gap:7px}
-.measurement-lines{margin:3px 0 0;display:grid;gap:4px}
-.measurement-line{display:flex;flex-wrap:wrap;gap:4px;font-size:13px;line-height:1.35}
-.measurement-line dt{font-weight:500;color:#514b42}
-.measurement-line dd{margin:0;font-weight:800;color:var(--ink)}
-.product-fact{background:var(--detail-bg);border-radius:10px;padding:9px 11px;min-width:0}
+.product-facts{display:grid;gap:5px;margin:0;padding:8px 9px;background:var(--detail-bg);border-radius:9px;font-size:13px;line-height:1.3;overflow-wrap:anywhere}
+.product-fact-summary{display:flex;flex-wrap:wrap;gap:4px 10px;margin:0;padding:0;list-style:none}
+.product-fact-summary li{min-width:0}
+.product-fact-caption{color:#514b42;font-size:11px}
+.product-fact-dimensions{margin:0;padding-top:5px;border-top:1px solid #d7cbb7}
+.product-fact-dimensions:first-child{padding-top:0;border-top:0}
 .product-fact-label{display:block;color:#514b42;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px}
-.product-fact-value{display:block;color:var(--ink);font-size:16px;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
 .card .desc{display:block;min-height:0;font-size:13px;line-height:1.45;background:#f4eee3;border:1px solid var(--line);border-radius:10px;padding:10px 11px}
 .card .desc .product-fact-label{margin-bottom:5px}
 .product-description-value{color:var(--ink);font-weight:650;overflow-wrap:anywhere}
@@ -299,8 +298,7 @@ body.pdf-mode .order-bubble{display:none!important}
  .card .content{padding:11px;gap:9px}
  .card .name{font-size:16px}
  .card .sku{font-size:13px}
- .product-fact{padding:8px 9px}
- .product-fact-value{font-size:14px}
+ .product-facts{padding:7px 8px;font-size:12px}
  .card .price{font-size:25px}
  .card .controls{gap:6px}
  .card .controls button{width:34px;height:36px}
@@ -665,10 +663,29 @@ function productMeasurementLines(p,raw){
  const unit=category==='boxpopuli'?'mm':'cm';
  return ['Alto','Largo','Profundidad'].map((label,i)=>({label,value:match[i+1].replace('.',',')+' '+unit}));
 }
-function productFactHTML(p,f){
- const dimensions=f.label==='Medidas'?productMeasurementLines(p,f.value):[];
- const value=dimensions.length?`<dl class="measurement-lines">${dimensions.map(d=>`<div class="measurement-line"><dt>${safeHTML(d.label)}:</dt><dd>${safeHTML(d.value)}</dd></div>`).join('')}</dl>`:`<span class="product-fact-value">${safeHTML(f.value)}</span>`;
- return `<div class="product-fact"><span class="product-fact-label">${safeHTML(f.label)}</span>${value}</div>`;
+function productFactsHTML(p,facts){
+ if(!facts.length)return '';
+ const summaries=[];
+ let measurements='';
+ for(const {label,value} of facts){
+  const escaped=safeHTML(value);
+  if(label==='Medidas'){
+   const dimensions=productMeasurementLines(p,value);
+   const parts=dimensions.map(d=>d.value.split(' '));
+   const size=parts.length?parts.map(([number])=>number).join(' × ')+' '+parts[0][1]:value;
+   const order=parts.length?' <span class="product-fact-caption">(alto × largo × prof.)</span>':'';
+   measurements=`<p class="product-fact-dimensions"><span class="product-fact-caption">Medidas:</span> <strong>${safeHTML(size)}</strong>${order}</p>`;
+  }else if(label==='Unidades por bulto' && /^\d+$/.test(value)){
+   summaries.push(`<li><strong>${escaped}</strong> <span class="product-fact-caption">por bulto</span></li>`);
+  }else if(label==='Capacidad' && /\d\s*[a-záéíóú]/i.test(value)){
+   summaries.push(`<li><strong>${escaped}</strong></li>`);
+  }else{
+   const caption=label==='Unidades por bulto'?'Bulto':label;
+   summaries.push(`<li><span class="product-fact-caption">${safeHTML(caption)}:</span> <strong>${escaped}</strong></li>`);
+  }
+ }
+ const summary=summaries.length?`<ul class="product-fact-summary" role="list">${summaries.join('')}</ul>`:'';
+ return `<div class="product-facts">${summary}${measurements}</div>`;
 }
 function productColors(p){
  const palette={negro:'#252525',blanco:'#ffffff',gris:'#969696','gris oscuro':'#575757','gris claro':'#c9c9c9',cedro:'#9a623f',marron:'#654331',beige:'#d8c4a2',natural:'#cda779',paraiso:'#d8b681',nogal:'#72503b',rojo:'#c43832',azul:'#3268a8',verde:'#56804a',amarillo:'#efca3a',naranja:'#df8a37',rosa:'#e4a0b2',violeta:'#865a9b',lila:'#b39ac9',celeste:'#8ec9e3',turquesa:'#52b5b4',dorado:'#c2a04f',plateado:'#b9bbbe',transparente:'repeating-conic-gradient(#fff 0% 25%,#ddd 0% 50%) 0 / 8px 8px'};
@@ -700,7 +717,7 @@ const imageHtml = images.length
 return `<article class="card"><div class="photo" onclick="inc('${p.SKU}')">${imageHtml}</div><div class="content">
 <span class="sku">${safeHTML(p.SKU)}</span>
 ${productTitleHTML(p)}
-${details.facts.length?`<div class="product-facts">${details.facts.map(f=>productFactHTML(p,f)).join('')}</div>`:''}
+${productFactsHTML(p,details.facts)}
 ${details.material?`<div class="product-material"><span class="product-material-label">Estructura:</span> ${safeHTML(details.material)}</div>`:''}
 ${colorSwatches(p)}
 ${details.description.length?`<div class="desc"><span class="product-fact-label">Detalles del producto</span><div class="product-description-value">${details.description.map(safeHTML).join('<br>')}</div></div>`:''}
