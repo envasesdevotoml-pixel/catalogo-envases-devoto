@@ -262,6 +262,10 @@ body.pdf-mode .order-bubble{display:none!important}
 .card .sku{font-size:14px;padding:5px 9px;border-radius:8px;line-height:1.2;max-width:100%;overflow-wrap:anywhere}
 .card .name{font-size:18px;line-height:1.25;overflow-wrap:anywhere}
 .product-facts{display:grid;gap:7px}
+.measurement-lines{margin:3px 0 0;display:grid;gap:4px}
+.measurement-line{display:flex;flex-wrap:wrap;gap:4px;font-size:13px;line-height:1.35}
+.measurement-line dt{font-weight:500;color:#514b42}
+.measurement-line dd{margin:0;font-weight:800;color:var(--ink)}
 .product-fact{background:var(--detail-bg);border-radius:10px;padding:9px 11px;min-width:0}
 .product-fact-label{display:block;color:#514b42;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px}
 .product-fact-value{display:block;color:var(--ink);font-size:16px;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
@@ -343,7 +347,7 @@ body.pdf-mode .order-bubble{display:none!important}
   <label for="clientNote">Observaciones</label>
   <textarea id="clientNote" placeholder="Dirección, forma de pago, datos de entrega, etc."></textarea>
 </div><div id="summaryItems"></div><div class="summary-total"><span>Total</span><strong id="summaryTotal">$ 0</strong></div><div class="summary-actions"><button class="btn btn-green" onclick="sendWhatsApp()">Enviar pedido por WhatsApp</button><button class="btn btn-blue" onclick="downloadOrderExcel()">Descargar pedido en Excel</button><button class="btn btn-light" onclick="copyOrder()">Copiar pedido</button></div></aside>
-<div class="modal" id="configModal"><div class="modal-card"><button class="close" onclick="closeConfig()">×</button><h2>Conectar Google Sheets</h2><p class="help">Pegá el link CSV publicado de Google Sheets. La página la guarda en este navegador. Después solo editás la planilla y el catálogo se actualiza al recargar.</p><input id="sheetUrl" placeholder="https://opensheet.elk.sh/ID_DEL_SHEET/Productos"><button class="btn btn-green" onclick="saveConfig()">Guardar y cargar catálogo</button><button class="btn btn-light" onclick="loadDemo()">Usar demo local</button><p class="help"><b>Columnas esperadas:</b> Activo, Categoria, Seccion, SKU, Producto, Descripcion, Medida, Estructura, Colores disponibles, Precio, ImagenURL, ImagenURL2, CodigoBarra, EtiquetasIncluidas, Orden, Página PDF, Orden PDF, Título PDF, Subtítulo PDF, Etiqueta PDF, Destacado PDF, Unidades por bulto, Cantidad de divisiones.</p></div></div>
+<div class="modal" id="configModal"><div class="modal-card"><button class="close" onclick="closeConfig()">×</button><h2>Conectar Google Sheets</h2><p class="help">Pegá el link CSV publicado de Google Sheets. La página la guarda en este navegador. Después solo editás la planilla y el catálogo se actualiza al recargar.</p><input id="sheetUrl" placeholder="https://opensheet.elk.sh/ID_DEL_SHEET/Productos"><button class="btn btn-green" onclick="saveConfig()">Guardar y cargar catálogo</button><button class="btn btn-light" onclick="loadDemo()">Usar demo local</button><p class="help"><b>Columnas esperadas:</b> Activo, Categoria, Seccion, SKU, Producto, Descripcion, Medida, Estructura, Colores disponibles, Precio, ImagenURL, ImagenURL2, CodigoBarra, EtiquetasIncluidas, Orden, Página PDF, Orden PDF, Título PDF, Subtítulo PDF, Etiqueta PDF, Destacado PDF, Unidades por bulto.</p></div></div>
 <script>
 const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS-1cWV4vv5RHwzD2FaPTZCKVS8KdJw4csZaYsqNt0OQtYb9Ef7qqwgCjvyG6WxGWz6RVzXPAP-ZwOK/pub?gid=805595643&single=true&output=csv';
 let SHEET_URL = localStorage.getItem('catalogSheetUrl') || DEFAULT_SHEET_URL;
@@ -499,6 +503,20 @@ function productFacts(p){
  add('Unidades por bulto',firstValue(p,['Unidades por bulto','Un. x Bulto','Un x Bulto','Unidades x bulto','Bulto','Cantidad x Bulto']));
  return {facts,description:other,material:firstValue(p,['Estructura','Fibroplus','Material'])};
 }
+function productMeasurementLines(p,raw){
+ // La columna G usa el orden Alto × Largo × Profundidad.
+ const value=String(raw||'').trim().replace(/\b(?:cm|mm)\b/gi,'').replace(/(\d)(?:cm|mm)/gi,'$1').trim();
+ const match=value.match(/^(\d+(?:[.,]\d+)?)\s*[x×*]\s*(\d+(?:[.,]\d+)?)\s*[x×*]\s*(\d+(?:[.,]\d+)?)$/i);
+ if(!match)return [];
+ const category=firstValue(p,['Categoria','Categoría']).toLowerCase().replace(/[\s_-]+/g,'');
+ const unit=category==='boxpopuli'?'mm':'cm';
+ return ['Alto','Largo','Profundidad'].map((label,i)=>({label,value:match[i+1].replace('.',',')+' '+unit}));
+}
+function productFactHTML(p,f){
+ const dimensions=f.label==='Medidas'?productMeasurementLines(p,f.value):[];
+ const value=dimensions.length?`<dl class="measurement-lines">${dimensions.map(d=>`<div class="measurement-line"><dt>${safeHTML(d.label)}:</dt><dd>${safeHTML(d.value)}</dd></div>`).join('')}</dl>`:`<span class="product-fact-value">${safeHTML(f.value)}</span>`;
+ return `<div class="product-fact"><span class="product-fact-label">${safeHTML(f.label)}</span>${value}</div>`;
+}
 function productColors(p){
  const palette={negro:'#252525',blanco:'#ffffff',gris:'#969696','gris oscuro':'#575757','gris claro':'#c9c9c9',cedro:'#9a623f',marron:'#654331',beige:'#d8c4a2',natural:'#cda779',paraiso:'#d8b681',nogal:'#72503b',rojo:'#c43832',azul:'#3268a8',verde:'#56804a',amarillo:'#efca3a',naranja:'#df8a37',rosa:'#e4a0b2',violeta:'#865a9b',lila:'#b39ac9',celeste:'#8ec9e3',turquesa:'#52b5b4',dorado:'#c2a04f',plateado:'#b9bbbe',transparente:'repeating-conic-gradient(#fff 0% 25%,#ddd 0% 50%) 0 / 8px 8px'};
  const normalize=v=>v.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/\s+/g,' ');
@@ -529,7 +547,7 @@ const imageHtml = images.length
 return `<article class="card"><div class="photo" onclick="inc('${p.SKU}')">${imageHtml}</div><div class="content">
 <span class="sku">${safeHTML(p.SKU)}</span>
 <div class="name">${safeHTML(p.Producto||'')}</div>
-${details.facts.length?`<div class="product-facts">${details.facts.map(f=>`<div class="product-fact"><span class="product-fact-label">${safeHTML(f.label)}</span><span class="product-fact-value">${safeHTML(f.value)}</span></div>`).join('')}</div>`:''}
+${details.facts.length?`<div class="product-facts">${details.facts.map(f=>productFactHTML(p,f)).join('')}</div>`:''}
 ${details.material?`<div class="product-material"><span class="product-material-label">Estructura:</span> ${safeHTML(details.material)}</div>`:''}
 ${colorSwatches(p)}
 ${details.description.length?`<div class="desc"><span class="product-fact-label">Detalles del producto</span><div class="product-description-value">${details.description.map(safeHTML).join('<br>')}</div></div>`:''}
