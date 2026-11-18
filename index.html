@@ -488,6 +488,35 @@ body.pdf-mode .catalog-workshop, body.pdf-mode .catalog-purchase-terms { display
 }
 @media print{.clear-cart-button,.whatsapp-float{display:none!important}}
 </style>
+<style>
+/* Menú mayorista compacto con el pedido integrado — conserva fichas y PDFs */
+@media screen {
+  .order-bubble{display:none!important}
+  #tabs .nav-order{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;white-space:normal;text-align:center;background:#f5efe5;border:1px solid #d7cbb7;color:var(--ink);min-width:205px;padding:7px 12px;line-height:1.3}
+  .nav-order-main{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 9px;font-size:13px}
+  .nav-order-main strong{font-weight:850;font-size:14px}
+  .nav-order-remaining{font-size:11px;font-weight:650;color:#7a512b}
+  .nav-progress,.minimum-track{display:block;overflow:hidden;width:100%;height:5px;border-radius:20px;background:#e2d6c5}
+  .nav-progress span,.minimum-fill{display:block;height:100%;width:0;background:#a38051;border-radius:20px;transition:width .18s}
+  #tabs .nav-order.minimum-reached .nav-order-remaining{color:#176443}
+  #tabs .nav-order.minimum-reached .nav-progress span,.order-minimum.minimum-reached .minimum-fill{background:#176443}
+  .order-minimum{margin:12px 0 2px;padding:10px 12px;border-radius:10px;background:#f5efe5;color:#7a512b;font-size:12px;font-weight:700;display:grid;gap:8px}
+  .order-minimum.minimum-reached{color:#176443;background:#e8f3ed}
+  .summary{bottom:14px;max-height:calc(100dvh - 28px);z-index:70}
+  .whatsapp-float{right:max(12px,env(safe-area-inset-right));left:auto;bottom:max(12px,env(safe-area-inset-bottom))}
+}
+@media screen and (max-width:720px){
+  #tabs{gap:4px!important;padding:6px 9px!important}
+  #tabs button:not(.nav-order){min-height:35px!important;padding:7px 5px!important;font-size:11px!important;line-height:1.15;border-radius:8px}
+  #tabs .nav-order{grid-column:1/-1;min-height:60px;padding:7px 9px!important;gap:3px;border-radius:9px}
+  .nav-order-main{font-size:12px;gap:4px 8px}
+  .nav-order-main strong{font-size:13px}
+  .nav-order-remaining{font-size:10px}
+  .summary{right:8px;bottom:8px;width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}
+  .whatsapp-float{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
+}
+@media print{.order-minimum{display:none!important}}
+</style>
 </head>
 <body>
 <header>
@@ -536,7 +565,7 @@ body.pdf-mode .catalog-workshop, body.pdf-mode .catalog-purchase-terms { display
     <p>Una empresa familiar que desde 2011 acompaña tu hogar y tus celebraciones, cuidando cada detalle.</p>
   </div>
 </footer>
-<button type="button" class="order-bubble" id="orderBubble" onclick="toggleSummary()" aria-controls="summary" aria-expanded="false"><span>🛒 Mi pedido <span id="bubbleCount" class="bubble-count">0</span></span><strong id="bubbleTotal">$ 0</strong></button>
+
 <aside class="summary" id="summary" aria-label="Resumen del pedido"><button class="close" onclick="toggleSummary()">×</button><h2>Mi Pedido</h2><div class="order-fields">
   <label for="sellerSelect">Vendedor</label>
   <select id="sellerSelect">
@@ -546,7 +575,7 @@ body.pdf-mode .catalog-workshop, body.pdf-mode .catalog-purchase-terms { display
   <input id="clientName" placeholder="Nombre del cliente o negocio">
   <label for="clientNote">Observaciones</label>
   <textarea id="clientNote" placeholder="Dirección, forma de pago, datos de entrega, etc."></textarea>
-</div><div id="summaryItems"></div><div class="summary-total"><span>Total</span><strong id="summaryTotal">$ 0</strong></div><div class="summary-actions"><button class="btn btn-green" onclick="sendWhatsApp()">Enviar pedido por WhatsApp</button><button class="btn btn-blue" onclick="downloadOrderExcel()">Descargar pedido en Excel</button><button class="btn btn-light" onclick="copyOrder()">Copiar pedido</button></div></aside>
+</div><div id="summaryItems"></div><div class="summary-total"><span>Total</span><strong id="summaryTotal">$ 0</strong></div><div class="order-minimum" id="orderMinimum" aria-live="polite"><div id="minimumMessage">Compra mínima: $ 300.000</div><div class="minimum-track"><div id="minimumFill" class="minimum-fill"></div></div></div><div class="summary-actions"><button class="btn btn-green" onclick="sendWhatsApp()">Enviar pedido por WhatsApp</button><button class="btn btn-blue" onclick="downloadOrderExcel()">Descargar pedido en Excel</button><button class="btn btn-light" onclick="copyOrder()">Copiar pedido</button></div></aside>
 <a class="whatsapp-float" href="https://wa.me/5491156191975?text=Hola%2C%20tengo%20una%20consulta%20sobre%20el%20cat%C3%A1logo%20mayorista%20de%20Envases%20Devoto." target="_blank" rel="noopener noreferrer" aria-label="¿Tenés dudas? Consultanos por WhatsApp">
   <svg viewBox="0 0 16 16" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false">
     <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.903 7.903 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93a7.898 7.898 0 0 0-2.327-5.607M7.994 14.521a6.573 6.573 0 0 1-3.356-.918l-.24-.143-2.492.654.665-2.431-.157-.251a6.56 6.56 0 0 1-1.007-3.506c0-3.63 2.957-6.588 6.591-6.588a6.548 6.548 0 0 1 4.658 1.93 6.55 6.55 0 0 1 1.928 4.662c-.003 3.634-2.96 6.591-6.59 6.591m3.614-4.934c-.198-.1-1.172-.576-1.355-.644-.182-.064-.315-.1-.444.1-.133.197-.513.646-.627.775-.115.133-.23.148-.43.05-.197-.1-.836-.307-1.592-.984-.59-.525-.985-1.175-1.103-1.373-.114-.198-.011-.304.087-.402.09-.09.198-.232.297-.347.099-.114.133-.197.198-.33.068-.133.034-.247-.015-.347-.05-.099-.444-1.076-.612-1.471-.159-.388-.322-.334-.444-.339l-.38-.007a.73.73 0 0 0-.528.247c-.183.198-.696.677-.696 1.654s.714 1.919.813 2.052c.1.133 1.4 2.137 3.392 2.997.473.205.842.327 1.13.418.476.152.909.13 1.252.08.38-.057 1.172-.48 1.339-.943.163-.464.163-.86.114-.944-.05-.083-.183-.133-.38-.232"/>
@@ -634,7 +663,7 @@ async function load(){
     products=demo; render();
   }
 }
-function renderTabs(cats){const tabs=document.getElementById('tabs'); if(!activeCat || !cats.includes(activeCat)) activeCat=cats[0]||''; tabs.innerHTML=cats.map(c=>`<button type="button" class="${c===activeCat?'active':''}" aria-pressed="${c===activeCat}" onclick="activeCat='${c.replace(/'/g,"\\'")}';localStorage.setItem('activeCat',activeCat);render()">${c}</button>`).join('') + `<button type="button" class="nav-order" onclick="toggleSummary()">Mi pedido</button>`}
+function renderTabs(cats){const tabs=document.getElementById('tabs'); if(!activeCat || !cats.includes(activeCat)) activeCat=cats[0]||''; tabs.innerHTML=cats.map(c=>`<button type="button" class="${c===activeCat?'active':''}" aria-pressed="${c===activeCat}" onclick="activeCat='${c.replace(/'/g,"\\'")}';localStorage.setItem('activeCat',activeCat);render()">${c}</button>`).join('') + `<button type="button" class="nav-order" id="navOrder" onclick="toggleSummary()" aria-controls="summary" aria-expanded="false"><span class="nav-order-main">🛒 Mi pedido <span id="navOrderCount">0 productos</span> <strong id="navOrderTotal">$ 0</strong></span><span id="navOrderRemaining" class="nav-order-remaining">Faltan $ 300.000 para el mínimo</span><span class="nav-progress"><span id="navProgressFill"></span></span></button>`}
 function render(){let list=products.filter(p=>(p.Activo||'SI').toUpperCase()!=='NO').sort((a,b)=>(Number(a.Orden)||9999)-(Number(b.Orden)||9999)); const q=document.getElementById('search').value.toLowerCase().trim(); const cats=[...new Set(list.map(p=>p.Categoria||'Sin categoría'))]; renderTabs(cats); if(!pdfMode){list=list.filter(p=>(p.Categoria||'Sin categoría')===activeCat)}; if(q && !pdfMode){list=list.filter(p=>Object.values(p).join(' ').toLowerCase().includes(q))} const bySec={}; list.forEach(p=>{const s=p.Seccion||'General'; (bySec[s] ||= []).push(p)}); const catalog=document.getElementById('catalog'); if(!list.length){catalog.innerHTML='<div class="empty">No hay productos para mostrar.</div>';return} catalog.innerHTML=Object.entries(bySec).map(([sec,items])=>`<section class="section"><h2 class="section-title">${sec}</h2><div class="grid">${items.map(card).join('')}</div></section>`).join(''); alignProductTitles(); renderTotals(false)}
 
 function firstValue(p, names){
@@ -798,7 +827,21 @@ ${/^(si|sí)$/i.test(String(p.EtiquetasIncluidas||'').trim())?`<div class="tag">
 <div class="purchase">
 <div class="price">${money(price)}</div><div class="controls"><button aria-label="Quitar una unidad" onclick="inc('${p.SKU}',-1)">−</button><input aria-label="Cantidad de ${safeHTML(productFullName(p)||p.SKU)}" type="number" min="0" value="${q}" onchange="setQty('${p.SKU}',this.value)"><button aria-label="Agregar una unidad" onclick="inc('${p.SKU}',1)">+</button><span class="subtotal">${q?money(q*price):''}</span></div>
 </div></div></article>`}
-function renderTotals(rebuildSummary=true){let total=0,count=0; products.forEach(p=>{const q=qty(p.SKU); if(q){total+=q*getPrice(p); count+=q}}); document.getElementById('topTotal').textContent=money(total); document.getElementById('summaryTotal').textContent=money(total); document.getElementById('bubbleTotal').textContent=money(total);document.getElementById('bubbleCount').textContent=count; const clearButton=document.getElementById('clearCartButton');if(clearButton)clearButton.hidden=count===0; if(rebuildSummary) renderSummary()}
+function renderTotals(rebuildSummary=true){
+ let total=0,count=0;
+ products.forEach(p=>{const q=qty(p.SKU);if(q){total+=q*getPrice(p);count+=q}});
+ const min=300000,remaining=Math.max(0,min-total),percent=Math.min(100,Math.max(0,total/min*100));
+ const write=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value};
+ write('topTotal',money(total));write('summaryTotal',money(total));
+ write('navOrderTotal',money(total));write('navOrderCount',count+' '+(count===1?'producto':'productos'));
+ const progressText=remaining?`Faltan ${money(remaining)} para el mínimo`:'✓ ¡Alcanzaste el mínimo de compra!';
+ write('navOrderRemaining',progressText);write('minimumMessage',progressText);
+ for(const id of ['navProgressFill','minimumFill']){const el=document.getElementById(id);if(el)el.style.width=percent+'%'}
+ const nav=document.getElementById('navOrder');if(nav)nav.classList.toggle('minimum-reached',remaining===0);
+ const minimum=document.getElementById('orderMinimum');if(minimum)minimum.classList.toggle('minimum-reached',remaining===0);
+ const clearButton=document.getElementById('clearCartButton');if(clearButton)clearButton.hidden=count===0;
+ if(rebuildSummary)renderSummary();
+}
 function renderSummary(){
  const wrap=document.getElementById('summaryItems');const items=products.filter(p=>qty(p.SKU));wrap.replaceChildren();
  if(!items.length){const empty=document.createElement('div');empty.className='empty';empty.textContent='Todavía no agregaste productos.';wrap.append(empty);return}
@@ -815,7 +858,7 @@ function renderSummary(){
   row.append(name,subtotal,controls,remove);wrap.append(row);
  });
 }
-function toggleSummary(){const isOpen=document.getElementById('summary').classList.toggle('show');document.getElementById('orderBubble').setAttribute('aria-expanded',String(isOpen));renderSummary()}
+function toggleSummary(){const isOpen=document.getElementById('summary').classList.toggle('show');document.getElementById('navOrder')?.setAttribute('aria-expanded',String(isOpen));renderSummary()}
 function cartItems(){return products.filter(p=>qty(p.SKU))}
 function selectedSellerPhone(){return document.getElementById('sellerSelect')?.value || ''}
 function selectedSellerName(){const s=document.getElementById('sellerSelect'); return s ? s.options[s.selectedIndex].text : ''}
